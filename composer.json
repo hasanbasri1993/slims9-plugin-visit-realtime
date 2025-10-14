@@ -1,0 +1,12 @@
+{
+    "name": "it/visit",
+    "require": {
+        "pusher/pusher-php-server": "^7.2"
+    },
+    "authors": [
+        {
+            "name": "Hasan Basri",
+            "email": "hasanbasri1493@gmail.com"
+        }
+    ]
+}
