@@ -48,6 +48,10 @@ if (isset($_POST['counter'])) {
   if (trim($_POST['memberID']) == '') {
     die(Json::stringify(['message' => __('Member ID can\'t be empty'), 'image' => 'person.png'])->withHeader());
   }
+  
+  if (!isset($_POST['visitPurpose']) || trim($_POST['visitPurpose']) == '') {
+    die(Json::stringify(['message' => __('Please select a visit purpose'), 'image' => 'person.png'])->withHeader());
+  }
    
   // sleep for a while
   sleep(0);
@@ -56,28 +60,50 @@ if (isset($_POST['counter'])) {
   $visitor->record(trim($_POST['memberID']));
 
   $image = 'person.png'; // default image
+  $visitPurpose = trim($_POST['visitPurpose']);
+  $visitPurposeText = '';
+  
+  // Convert visit purpose value to text
+  switch($visitPurpose) {
+    case '1':
+      $visitPurposeText = __('Baca');
+      break;
+    case '2':
+      $visitPurposeText = __('Browsing');
+      break;
+    case '3':
+      $visitPurposeText = __('Belajar');
+      break;
+    default:
+      $visitPurposeText = __('Unknown');
+  }
+  
   if ($visitor->getResult() === true) {
     // Map visitor data into variable list
     list($memberId, $memberName, $institution, $image) = $visitor->getData();
 
-    // default message
-    $message = $memberName . __(', thank you for inserting your data to our visitor log');
+    // default message with visit purpose
+    $message = $memberName . __(', thank you for inserting your data to our visitor log') . ' (' . $visitPurposeText . ')';
 
     // Expire message
     if ($visitor->isMemberExpire()) $message = '<div class="error visitor-error">'.__('Your membership already EXPIRED, please renew/extend your membership immediately').'</div>';
 
     // already checkin message
-    if ($visitor->isAlreadyCheckIn()) $message = __('Welcome back').' '.$memberName.'.';
+    if ($visitor->isAlreadyCheckIn()) $message = __('Welcome back').' '.$memberName.'. (' . $visitPurposeText . ')';
 
-  // For guest access institution data is required!
-  } else if ($visitor->isInstitutionEmpty()) {
-    $message = __('Sorry, Please fill institution field if you are not library member');
+  // For guest access, we now require visit purpose instead of institution
   } else {
     $message = ENVIRONMENT === 'production' ? __('Error inserting counter data to database!') : $visitor->getError();
   }
   
-  // send response
-  die(Json::stringify(['message' => $message, 'image' => $image, 'status' => $visitor->getError()])->withHeader());
+  // send response with visit purpose
+  die(Json::stringify([
+    'message' => $message, 
+    'image' => $image, 
+    'status' => $visitor->getError(),
+    'visit_purpose' => $visitPurpose,
+    'visit_purpose_text' => $visitPurposeText
+  ])->withHeader());
 }
 
 // include visitor form template

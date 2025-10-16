@@ -100,5 +100,8 @@ $plugins->hook(Plugins::MEMBER_ON_VISIT, function ($data) use ($env) {
   );
   
   $data['message'] =  $data['member_name'] . __(', thank you for inserting your data to our visitor log');
+  if (isset($data['visit_purpose_text'])) {
+    $data['message'] .= ' (' . $data['visit_purpose_text'] . ')';
+  }
   $pusher->trigger($pusherChannel, $pusherEvent, $data);
 });

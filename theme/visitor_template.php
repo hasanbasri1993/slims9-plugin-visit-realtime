@@ -47,15 +47,56 @@ if (isset($_GET['select_lang'])) {
 ?>
 <div class="vegas-slide" style="position: fixed; z-index: -1"></div>
 <div class="flex h-screen w-full" id="visitor_counter" style="background: rgba(0,0,0,0.3)">
-    <div v-if="textInfo !== ''" class="rounded p-2 mt-4 bg-blue-lighter text-blue-darker md:hidden">{{textInfo}}</div>
+    <div class="bg-white w-full md:w-1/3 px-8 pt-8 pb-3 flex flex-col justify-between">
+        <div>
+            <h3 class="font-light mb-2"><?= __('Welcome to ') . $sysconf['library_name']; ?></h3>
+            <p class="lead">
+                <?= __('Please fill your member ID or name.') ?>
+            </p>
 
+            <div v-if="textInfo !== ''" class="rounded p-2 mt-4 bg-blue-lighter text-blue-darker md:hidden">{{textInfo}}</div>
 
+            <form class="mt-4" @submit.prevent="onSubmit">
+                <div class="form-group">
+                    <label for="exampleInputEmail1"><?= __('Member ID') ?></label>
+                    <input v-model="memberId" ref="memberId" autofocus type="text" class="form-control" id="exampleInputEmail1"
+                        aria-describedby="emailHelp" placeholder="<?= __('Enter your member ID') ?>">
+                </div>
+                <div class="form-group">
+                    <label><?= __('Visit Purpose') ?></label>
+                    <div class="form-check">
+                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose1" value="1">
+                        <label class="form-check-label" for="visitPurpose1">
+                            <?= __('Baca') ?>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose2" value="2">
+                        <label class="form-check-label" for="visitPurpose2">
+                            <?= __('Browsing') ?>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose3" value="3">
+                        <label class="form-check-label" for="visitPurpose3">
+                            <?= __('Belajar') ?>
+                        </label>
+                    </div>
+                    <small id="emailHelp" class="form-text text-muted"><?= __('Enough fill your member ID if you are member of ') . $sysconf['library_name']; ?></small>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><?= __('Check In') ?></button>
+            </form>
+        </div>
+        <div class="text-right">
+            <small class="text-grey-dark"><?= __('Powered by ') ?> <code>SLiMS</code></small>
+        </div>
+    </div>
     <div class="flex-1 hidden md:block">
         <div class="h-screen">
             <div v-show="textInfo !== ''" class="flex items-center h-screen p-8">
                 <div class="w-32">
-                    <div class="w-32 h-32 bg-white rounded-full border-white border-4 shadow">
-                        <img :src="image" alt="image" class="rounded-full" @error="onImageError">
+                    <div class="w-32 h-32 bg-white  border-white border-4 shadow">
+                        <img :src="image" alt="image" class="" @error="onImageError">
                     </div>
                 </div>
                 <div class="px-8">
@@ -80,7 +121,7 @@ if (isset($_GET['select_lang'])) {
     // Enable pusher logging - don't include this in production
     Pusher.logToConsole = false;
 
-    var pusher = new Pusher('<?= $env['PUSHER_KEY'] ; ?>', {
+    var pusher = new Pusher('<?= $env['PUSHER_KEY']; ?>', {
         cluster: 'ap1',
         encrypted: true
     });
@@ -90,7 +131,7 @@ if (isset($_GET['select_lang'])) {
         data() {
             return {
                 memberId: '',
-                institution: '',
+                visitPurpose: '',
                 textInfo: '',
                 image: './images/persons/photo.png',
                 quotes: {},
@@ -111,11 +152,10 @@ if (isset($_GET['select_lang'])) {
                 var self = this; // Store Vue instance reference
                 var channel = pusher.subscribe('my-channel');
                 channel.bind('my-event', function(data) {
-                    self.memberId = data.member_id || '';
+                    //self.memberId = data.member_id || '';
                     self.textInfo = data.message || '';
                     self.image = `./images/persons/${data.member_image || 'photo.png'}`;
-                    self.institution = data.institution || '';
-                    
+
                     // Only play TTS if it's been initialized by user interaction
                     if (self.ttsEnabled) {
                         self.textToSpeech(data.message || "selamat malam")
@@ -125,6 +165,7 @@ if (isset($_GET['select_lang'])) {
                     clearTimeout(self.timeout);
                     self.timeout = setTimeout(() => {
                         self.getQuotes();
+                        self.resetForm()
                     }, 5000);
                 });
             },
@@ -148,14 +189,57 @@ if (isset($_GET['select_lang'])) {
                         this.textInfo = ''
                     })
             },
+            onSubmit: function() {
+                if (!this.memberId.trim()) {
+                    alert('<?= __("Member ID is required") ?>');
+                    return;
+                }
+                
+                if (!this.visitPurpose.trim()) {
+                    alert('<?= __("Please select a visit purpose") ?>');
+                    return;
+                }
+                let url = 'index.php?p=visitor&room=' + this.visitPurpose;
+                let data = new FormData()
+                data.append('memberID', this.memberId)
+                data.append('institution', this.institution)
+                data.append('counter', 1)
+
+                axios({
+                        url: url,
+                        method: 'post',
+                        data: data,
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'X-Response-With': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        this.textInfo = res.data.message
+                        this.image = `./images/persons/${res.data.image}`
+                        <?php if ($sysconf['template']['visitor_log_voice']) : ?>
+                            this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
+                        <?php endif; ?>
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    })
+                    .finally(() => {
+                        this.resetForm()
+                        clearTimeout(this.timeout)
+                        this.timeout = setTimeout(() => {
+                            this.getQuotes()
+                        }, 5000)
+                    })
+            },
             resetForm: function() {
                 this.memberId = ''
-                this.institution = ''
+                this.visitPurpose = ''
                 this.$refs.memberId.focus()
             },
             initTextToSpeech: function() {
                 var self = this;
-                
+
                 // Add event listeners for user interaction to enable TTS
                 var enableTTS = function() {
                     if (!self.ttsInitialized) {
@@ -167,7 +251,7 @@ if (isset($_GET['select_lang'])) {
                         document.removeEventListener('touchstart', enableTTS);
                     }
                 };
-                
+
                 // Listen for various user interactions
                 document.addEventListener('click', enableTTS);
                 document.addEventListener('keydown', enableTTS);
@@ -182,7 +266,7 @@ if (isset($_GET['select_lang'])) {
                     console.log('TTS not enabled yet - waiting for user interaction');
                     return;
                 }
-                
+
                 var utterance = new SpeechSynthesisUtterance(message);
                 var voices = speechSynthesis.getVoices();
                 utterance['volume'] = 1;
@@ -190,7 +274,7 @@ if (isset($_GET['select_lang'])) {
                 utterance['pitch'] = 1;
                 utterance['lang'] = 'id-ID';
                 utterance['voice'] = null;
-                
+
                 // Try to find Indonesian voice
                 for (var i = 0; i < voices.length; i++) {
                     if (voices[i].lang.includes('id')) {
@@ -198,7 +282,7 @@ if (isset($_GET['select_lang'])) {
                         break;
                     }
                 }
-                
+
                 console.log('Playing TTS:', message);
                 speechSynthesis.cancel();
                 speechSynthesis.speak(utterance);
