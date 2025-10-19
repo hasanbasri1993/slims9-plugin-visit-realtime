@@ -6,6 +6,8 @@
  * @File name           : visitor_template.php
  */
 
+ use SLiMS\{DB};
+
 $main_template_path = __DIR__ . '/login_template.inc.php';
 // set default language
 if (isset($_GET['select_lang'])) {
@@ -43,6 +45,11 @@ if (isset($_GET['select_lang'])) {
 } else if (isset($_COOKIE['select_lang'])) {
     $sysconf['default_lang'] = trim(strip_tags($_COOKIE['select_lang']));
 }
+$data = [];
+$activeSchema = DB::getInstance()->query('select * from mst_visitor_room');
+if ($activeSchema->rowCount()) {
+    $data = $activeSchema->fetchAll(\PDO::FETCH_ASSOC);
+}
 
 ?>
 <div class="vegas-slide" style="position: fixed; z-index: -1"></div>
@@ -64,24 +71,14 @@ if (isset($_GET['select_lang'])) {
                 </div>
                 <div class="form-group">
                     <label><?= __('Visit Purpose') ?></label>
-                    <div class="form-check">
-                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose1" value="1">
-                        <label class="form-check-label" for="visitPurpose1">
-                            <?= __('Baca') ?>
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose2" value="2">
-                        <label class="form-check-label" for="visitPurpose2">
-                            <?= __('Browsing') ?>
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose3" value="3">
-                        <label class="form-check-label" for="visitPurpose3">
-                            <?= __('Belajar') ?>
-                        </label>
-                    </div>
+                    <?php foreach ($data as $item) : ?>
+                        <div class="form-check">
+                            <input v-model="visitPurpose" class="form-check-input" type="radio" name="visitPurpose" id="visitPurpose<?= $item['unique_code'] ?>" value="<?= $item['unique_code'] ?>">
+                            <label class="form-check-label" for="visitPurpose<?= $item['unique_code'] ?>">
+                                <?= $item['name'] ?>
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
                     <small id="emailHelp" class="form-text text-muted"><?= __('Enough fill your member ID if you are member of ') . $sysconf['library_name']; ?></small>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block"><?= __('Check In') ?></button>
@@ -144,8 +141,6 @@ if (isset($_GET['select_lang'])) {
             // Store Vue instance globally for Pusher access
             this.pusherInit()
             this.getQuotes()
-            // Initialize text-to-speech on first user interaction
-            this.initTextToSpeech()
         },
         methods: {
             pusherInit: function() {
@@ -237,55 +232,17 @@ if (isset($_GET['select_lang'])) {
                 this.visitPurpose = ''
                 this.$refs.memberId.focus()
             },
-            initTextToSpeech: function() {
-                var self = this;
-
-                // Add event listeners for user interaction to enable TTS
-                var enableTTS = function() {
-                    if (!self.ttsInitialized) {
-                        self.ttsInitialized = true;
-                        self.ttsEnabled = true;
-                        // Remove event listeners after first interaction
-                        document.removeEventListener('click', enableTTS);
-                        document.removeEventListener('keydown', enableTTS);
-                        document.removeEventListener('touchstart', enableTTS);
-                    }
-                };
-
-                // Listen for various user interactions
-                document.addEventListener('click', enableTTS);
-                document.addEventListener('keydown', enableTTS);
-                document.addEventListener('touchstart', enableTTS);
-            },
-            enableTextToSpeech: function() {
-                this.ttsEnabled = true;
-                this.ttsInitialized = true;
-            },
             textToSpeech: function(message) {
-                if (!this.ttsEnabled) {
-                    console.log('TTS not enabled yet - waiting for user interaction');
-                    return;
-                }
-
-                var utterance = new SpeechSynthesisUtterance(message);
+                var message = new SpeechSynthesisUtterance(message);
                 var voices = speechSynthesis.getVoices();
-                utterance['volume'] = 1;
-                utterance['rate'] = 1;
-                utterance['pitch'] = 1;
-                utterance['lang'] = 'id-ID';
-                utterance['voice'] = null;
-
-                // Try to find Indonesian voice
-                for (var i = 0; i < voices.length; i++) {
-                    if (voices[i].lang.includes('id')) {
-                        utterance['voice'] = voices[i];
-                        break;
-                    }
-                }
-
-                console.log('Playing TTS:', message);
+                //console.log(message);
+                message['volume'] = 1;
+                message['rate'] = 1;
+                message['pitch'] = 1;
+                message['lang'] = '<?php echo str_replace('_', '-', $sysconf['default_lang']); ?>';
+                message['voice'] = null;
                 speechSynthesis.cancel();
-                speechSynthesis.speak(utterance);
+                speechSynthesis.speak(message);
             }
         }
     })
