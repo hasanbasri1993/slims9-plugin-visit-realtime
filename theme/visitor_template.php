@@ -194,10 +194,11 @@ if ($activeSchema->rowCount()) {
                     alert('<?= __("Please select a visit purpose") ?>');
                     return;
                 }
-                let url = 'index.php?p=visitor&room=' + this.visitPurpose;
+                let url = 'index.php?p=visit';
                 let data = new FormData()
                 data.append('memberID', this.memberId)
                 data.append('institution', this.institution)
+                data.append('visitPurpose', this.visitPurpose)
                 data.append('counter', 1)
 
                 axios({
@@ -210,10 +211,10 @@ if ($activeSchema->rowCount()) {
                         }
                     })
                     .then(res => {
-                        this.textInfo = res.data.message
+                        this.textInfo = res.data.message || ''
                         this.image = `./images/persons/${res.data.image}`
                         <?php if ($sysconf['template']['visitor_log_voice']) : ?>
-                            this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
+                            if (this.textInfo) this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
                         <?php endif; ?>
                     })
                     .catch(err => {

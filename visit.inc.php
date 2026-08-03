@@ -45,7 +45,7 @@ ob_start();
 
 if (isset($_POST['counter'])) {
 
-  if (trim($_POST['memberID']) == '') {
+  if (!isset($_POST['memberID']) || trim($_POST['memberID']) == '') {
     die(Json::stringify(['message' => __('Member ID can\'t be empty'), 'image' => 'person.png'])->withHeader());
   }
   
