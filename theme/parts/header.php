@@ -76,8 +76,6 @@ $request_uri = urlencode(strip_tags(urldecode($_SERVER['REQUEST_URI'])));
     <!-- SLiMS CSS -->
     <link rel="stylesheet" href="<?= JWB; ?>colorbox/colorbox.css">
     <link rel="stylesheet" href="<?= JWB; ?>ion.rangeSlider/css/ion.rangeSlider.min.css">
-    <!-- // Flag css -->
-    <link rel="stylesheet" href="<?php echo assets('css/flag-icon.min.css'); ?>">
     <!-- // my custom style -->
     <link rel="stylesheet" href="<?php echo assets('css/style.css?v=' . date('Ymd-his')); ?>">
 
@@ -94,7 +92,6 @@ $request_uri = urlencode(strip_tags(urldecode($_SERVER['REQUEST_URI'])));
     <script src="<?php echo assets('js/vue.min.js'); ?>"></script>
     <!-- // load jquery library -->
     <script src="<?php echo assets('js/jquery.min.js'); ?>"></script>
-    <script src="<?php echo assets('js/masonry.pkgd.min.js'); ?>"></script>
     <!-- // load bootstrap javascript -->
     <script src="<?php echo assets('js/bootstrap.bundle.min.js'); ?>"></script>
     <!-- // load vegas javascript -->

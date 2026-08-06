@@ -35,29 +35,37 @@ $env = loadVisitPluginEnv();
 $visitor = new Visitor($sysconf['allowed_counter_ip'], $sysconf['time_visitor_limitation'], $opac);
 $visitor->accessCheck();
 
-#if ($sysconf['enable_counter_by_ip'] && !$visitor->isAccessAllow()) {
-#    header ("location: index.php");
-#    exit;
-#}
-
 // start the output buffering for main content
 ob_start();
 
 if (isset($_POST['counter'])) {
 
-  if (trim($_POST['memberID']) == '') {
+  if (!isset($_POST['memberID']) || trim($_POST['memberID']) == '') {
     die(Json::stringify(['message' => __('Member ID can\'t be empty'), 'image' => 'person.png'])->withHeader());
   }
-  
+
+  // Older/IoT clients send the visit purpose code as "institution" instead of
+  // "visitPurpose" — fall back to it only when visitPurpose wasn't sent at all,
+  // so it never overrides a real value coming from the web form.
+  if ((!isset($_POST['visitPurpose']) || trim($_POST['visitPurpose']) == '') && isset($_POST['institution'])) {
+    $_POST['visitPurpose'] = $_POST['institution'];
+  }
+
   if (!isset($_POST['visitPurpose']) || trim($_POST['visitPurpose']) == '') {
     die(Json::stringify(['message' => __('Please select a visit purpose'), 'image' => 'person.png'])->withHeader());
   }
-   
+
+  // Same fallback for room_code: IoT clients don't pass ?room= in the query
+  // string, so Visitor::record() would otherwise store a null room_code.
+  if (!isset($_GET['room']) || trim($_GET['room']) === '') {
+    $_GET['room'] = trim($_POST['visitPurpose']);
+  }
+
   // sleep for a while
   sleep(0);
 
   // Record visitor data
-  $visitor->record(trim($_POST['memberID']));
+  $visitor = $visitor->record(trim($_POST['memberID']));
 
   $image = 'person.png'; // default image
   $visitPurpose = trim($_POST['visitPurpose']);
@@ -69,10 +77,13 @@ if (isset($_POST['counter'])) {
       $visitPurposeText = __('Baca');
       break;
     case '2':
-      $visitPurposeText = __('Browsing');
+      $visitPurposeText = __('Mengerjakan Tugas');
       break;
     case '3':
-      $visitPurposeText = __('Belajar');
+      $visitPurposeText = __('Mencari Referensi');
+      break;
+    case '4':
+      $visitPurposeText = __('Mengakses Internet/Komputer');
       break;
     default:
       $visitPurposeText = __('Unknown');
@@ -96,6 +107,38 @@ if (isset($_POST['counter'])) {
     $message = ENVIRONMENT === 'production' ? __('Error inserting counter data to database!') : $visitor->getError();
   }
   
+  // Get Pusher configuration from environment variables
+  $pusherKey = $env['PUSHER_KEY'] ?? '';
+  $pusherSecret = $env['PUSHER_SECRET'] ?? '';
+  $pusherAppId = $env['PUSHER_APP_ID'] ?? '';
+  $pusherCluster = $env['PUSHER_CLUSTER'] ?? 'ap1';
+  $pusherUseTls = isset($env['PUSHER_USE_TLS']) ? $env['PUSHER_USE_TLS'] === 'true' : true;
+  $pusherChannel = $env['PUSHER_CHANNEL'] ?? 'my-channel';
+  $pusherEvent = $env['PUSHER_EVENT'] ?? 'my-event';
+  
+  $pusher = new SimplePusher(
+    $pusherKey,
+    $pusherSecret,
+    $pusherAppId,
+    $pusherCluster,
+    $pusherUseTls
+  );
+
+  $data['member_image'] = $image;
+  $data['member_id'] = $memberId;
+  $data['member_name'] = $memberName;
+  $data['institution'] = $institution;
+  $data['visit_purpose'] = $visitPurpose;
+  $data['visit_purpose_text'] = $visitPurposeText;
+  $data['message'] =  $memberName . __(', thank you for inserting your data to our visitor log');
+  if (isset($visitPurposeText) && !empty($visitPurposeText)) {
+    $data['message'] .= ' (' .  $visitPurposeText . ')';
+  }
+  // Exclude the submitting browser's own Pusher connection from the broadcast,
+  // otherwise it hears the greeting twice: once from this HTTP response, once
+  // from the Pusher event it triggered on itself.
+  $pusher->trigger($pusherChannel, $pusherEvent, $data, $_POST['socket_id'] ?? null);
+
   // send response with visit purpose
   die(Json::stringify([
     'message' => $message, 
@@ -108,19 +151,7 @@ if (isset($_POST['counter'])) {
 
 // include visitor form template
 require __DIR__ . '/theme/visitor_template.php';
-// require SB.$sysconf['template']['dir'].'/'.$sysconf['template']['theme'].'/visitor_template.php';
 
-
-?>
-<div style="display: none !important;">
-<input type="text" id="text_voice" value=""></input>
-<button type="button" id="speak">Speak</button>
-</div>
-
-<script type="text/javascript">
-</script>
-
-<?php
 // main content
 $main_content = ob_get_clean();
 // page title

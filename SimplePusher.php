@@ -26,14 +26,21 @@ class SimplePusher
     /**
      * Trigger an event on a channel. Returns true on a 200 response
      * from Pusher, false otherwise (network error or non-2xx).
+     *
+     * Pass $excludeSocketId (the triggering client's own Pusher connection
+     * socket_id) to stop that same client from receiving the event back.
      */
-    public function trigger(string $channel, string $event, array $data): bool
+    public function trigger(string $channel, string $event, array $data, ?string $excludeSocketId = null): bool
     {
-        $body = json_encode([
+        $payload = [
             'name'     => $event,
             'channels' => [$channel],
             'data'     => json_encode($data),
-        ]);
+        ];
+        if (!empty($excludeSocketId)) {
+            $payload['socket_id'] = $excludeSocketId;
+        }
+        $body = json_encode($payload);
 
         $path = "/apps/{$this->appId}/events";
 

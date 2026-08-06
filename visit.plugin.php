@@ -39,40 +39,6 @@ function loadVisitPluginEnv() {
   return $env;
 }
 
-// Load environment variables
-$env = loadVisitPluginEnv();
-
 require_once __DIR__ . '/SimplePusher.php';
 
 Plugins::opac('visit', __DIR__ . '/visit.inc.php');
-
-$plugins = Plugins::getInstance();
-$plugins->hook(Plugins::MEMBER_ON_VISIT, function ($data) use ($env) {
-  // Check if plugin is enabled
-  if (!isset($env['VISIT_PLUGIN_ENABLED']) || $env['VISIT_PLUGIN_ENABLED'] !== 'true') {
-    return;
-  }
-  
-  // Get Pusher configuration from environment variables
-  $pusherKey = $env['PUSHER_KEY'] ?? '';
-  $pusherSecret = $env['PUSHER_SECRET'] ?? '';
-  $pusherAppId = $env['PUSHER_APP_ID'] ?? '';
-  $pusherCluster = $env['PUSHER_CLUSTER'] ?? 'ap1';
-  $pusherUseTls = isset($env['PUSHER_USE_TLS']) ? $env['PUSHER_USE_TLS'] === 'true' : true;
-  $pusherChannel = $env['PUSHER_CHANNEL'] ?? 'my-channel';
-  $pusherEvent = $env['PUSHER_EVENT'] ?? 'my-event';
-  
-  $pusher = new SimplePusher(
-    $pusherKey,
-    $pusherSecret,
-    $pusherAppId,
-    $pusherCluster,
-    $pusherUseTls
-  );
-
-  $data['message'] =  $data['member_name'] . __(', thank you for inserting your data to our visitor log');
-  if (isset($data['visit_purpose_text'])) {
-    $data['message'] .= ' (' . $data['visit_purpose_text'] . ')';
-  }
-  $pusher->trigger($pusherChannel, $pusherEvent, $data);
-});

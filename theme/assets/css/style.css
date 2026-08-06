@@ -612,20 +612,6 @@ html {
     color: #4a5568;
 }
 
-#vio {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    z-index: 99999999999;
-    background: #f56565;
-    padding: 8px 0;
-    color: #fff5f5;
-}
-
-#vio a {
-    color: #2d3748;
-}
-
 #colorbox {
     border-radius: 5px;
 }

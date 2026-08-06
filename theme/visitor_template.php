@@ -54,6 +54,13 @@ if ($activeSchema->rowCount()) {
 ?>
 <div class="vegas-slide" style="position: fixed; z-index: -1"></div>
 <div class="flex h-screen w-full" id="visitor_counter" style="background: rgba(0,0,0,0.3)">
+    <div v-if="!ttsInitialized" style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+        <div class="bg-white rounded shadow p-8 text-center" style="width: 90%; max-width: 24rem;">
+            <h3 class="font-light mb-2"><?= __('Welcome to ') . $sysconf['library_name']; ?></h3>
+            <p class="lead"><?= __('Tap continue to start.') ?></p>
+            <button type="button" class="btn btn-primary btn-block mt-4" @click="initTTS"><?= __('Continue') ?></button>
+        </div>
+    </div>
     <div class="bg-white w-full md:w-1/3 px-8 pt-8 pb-3 flex flex-col justify-between">
         <div>
             <h3 class="font-light mb-2"><?= __('Welcome to ') . $sysconf['library_name']; ?></h3>
@@ -113,10 +120,11 @@ if ($activeSchema->rowCount()) {
 <script src="<?php echo $sysconf['template']['dir'] . '/' . $sysconf['template']['theme'] . '/assets/js/axios.min.js'; ?>"></script>
 <script src="<?= JWB . 'he.js' ?>"></script>
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/speakit-js@1.1.0/dist/Speakit.1.1.0.cdn.min.js"></script>
 
 <script>
     // Enable pusher logging - don't include this in production
-    Pusher.logToConsole = false;
+    Pusher.logToConsole = true;
 
     var pusher = new Pusher('<?= $env['PUSHER_KEY']; ?>', {
         cluster: 'ap1',
@@ -184,7 +192,23 @@ if ($activeSchema->rowCount()) {
                         this.textInfo = ''
                     })
             },
+            initTTS: function() {
+                if (this.ttsInitialized) return;
+                this.ttsInitialized = true;
+                this.ttsEnabled = true;
+
+                // Speaking a silent utterance here, inside a real user gesture (tap/submit),
+                // is what unlocks speechSynthesis in browsers that block it until user interaction.
+                // Must be non-empty text: an empty utterance never actually invokes the engine,
+                // so it wouldn't count as the real user-gesture-triggered speak() browsers require.
+                Speakit.utteranceVolume = 0;
+                Speakit.readText(' ', '<?php echo str_replace('_', '-', $sysconf['default_lang']); ?>').catch(() => {});
+
+                this.$nextTick(() => this.$refs.memberId.focus());
+            },
             onSubmit: function() {
+                this.initTTS();
+
                 if (!this.memberId.trim()) {
                     alert('<?= __("Member ID is required") ?>');
                     return;
@@ -194,11 +218,13 @@ if ($activeSchema->rowCount()) {
                     alert('<?= __("Please select a visit purpose") ?>');
                     return;
                 }
-                let url = 'index.php?p=visitor&room=' + this.visitPurpose;
+                let url = 'index.php?p=visit&room=' + encodeURIComponent(this.visitPurpose);
                 let data = new FormData()
                 data.append('memberID', this.memberId)
                 data.append('institution', this.institution)
+                data.append('visitPurpose', this.visitPurpose)
                 data.append('counter', 1)
+                data.append('socket_id', pusher.connection.socket_id)
 
                 axios({
                         url: url,
@@ -210,10 +236,10 @@ if ($activeSchema->rowCount()) {
                         }
                     })
                     .then(res => {
-                        this.textInfo = res.data.message
+                        this.textInfo = res.data.message || ''
                         this.image = `./images/persons/${res.data.image}`
                         <?php if ($sysconf['template']['visitor_log_voice']) : ?>
-                            this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
+                            if (this.textInfo) this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
                         <?php endif; ?>
                     })
                     .catch(err => {
@@ -233,16 +259,11 @@ if ($activeSchema->rowCount()) {
                 this.$refs.memberId.focus()
             },
             textToSpeech: function(message) {
-                var message = new SpeechSynthesisUtterance(message);
-                var voices = speechSynthesis.getVoices();
-                //console.log(message);
-                message['volume'] = 1;
-                message['rate'] = 1;
-                message['pitch'] = 1;
-                message['lang'] = '<?php echo str_replace('_', '-', $sysconf['default_lang']); ?>';
-                message['voice'] = null;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(message);
+                Speakit.utteranceVolume = 1;
+                Speakit.utteranceRate = 1;
+                Speakit.utterancePitch = 1;
+                Speakit.readText(message, '<?php echo str_replace('_', '-', $sysconf['default_lang']); ?>')
+                    .catch(err => console.log(err));
             }
         }
     })
