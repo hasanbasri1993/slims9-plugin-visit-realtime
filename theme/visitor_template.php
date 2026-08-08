@@ -559,7 +559,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             },
             displayedRecentVisitors: function() {
                 if (this.isShowMode) {
-                    return this.recentVisitors.slice(0, 6);
+                    return this.recentVisitors.slice(0, 10);
                 }
                 return this.recentVisitors.slice(0, 10);
             }
@@ -776,12 +776,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         }
                     })
                     .then(res => {
-                        this.textInfo = res.data.message || ''
-                        this.todayVisitorCount++;
-                        this.weekVisitorCount++;
-                        this.monthVisitorCount++;
-                        
-                        // Extract real member name from response or greeting string
+                        this.textInfo = res.data.message || '';
                         let realName = res.data.member_name || res.data.memberName;
                         if (!realName && this.textInfo) {
                             realName = this.textInfo.split(',')[0].trim();
@@ -791,8 +786,22 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         }
 
                         this.memberName = realName;
-                        this.visitPurposeText = res.data.visit_purpose_text || '';
                         this.image = `./images/persons/${res.data.image || 'photo.png'}`;
+
+                        if (res.data.throttled) {
+                            // Throttled: User already checked in within 1 hour.
+                            // Display warning banner & speak TTS without inserting DB record or incrementing counter.
+                            <?php if ($sysconf['template']['visitor_log_voice']) : ?>
+                                if (this.textInfo) this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''));
+                            <?php endif; ?>
+                            return;
+                        }
+
+                        this.todayVisitorCount++;
+                        this.weekVisitorCount++;
+                        this.monthVisitorCount++;
+                        
+                        this.visitPurposeText = res.data.visit_purpose_text || '';
                         
                         this.addRecentVisitor({
                             visitor_id: Date.now(),
@@ -804,7 +813,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         });
 
                         <?php if ($sysconf['template']['visitor_log_voice']) : ?>
-                            if (this.textInfo) this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''))
+                            if (this.textInfo) this.textToSpeech(this.textInfo.replace(/(<([^>]+)>)/ig, ''));
                         <?php endif; ?>
                     })
                     .catch(err => {

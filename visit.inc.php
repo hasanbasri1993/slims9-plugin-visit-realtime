@@ -163,6 +163,53 @@ if (isset($_POST['counter'])) {
     $_GET['room'] = trim($_POST['visitPurpose']);
   }
 
+  // 1-Hour Anti-Duplicate Checkin Limit Rule
+  $rawMemberId = trim($_POST['memberID']);
+  $oneHourAgo = date('Y-m-d H:i:s', time() - 3600);
+
+  $mLookupStmt = DB::getInstance()->prepare("
+      SELECT member_id, member_name, COALESCE(member_image, 'photo.png') AS member_image
+      FROM member 
+      WHERE (member_id = :id OR member_name = :id)
+      LIMIT 1
+  ");
+  $mLookupStmt->execute([':id' => $rawMemberId]);
+  $mLookup = $mLookupStmt->fetch(\PDO::FETCH_ASSOC);
+
+  $checkMemberId = $mLookup ? $mLookup['member_id'] : $rawMemberId;
+  $checkMemberName = $mLookup ? $mLookup['member_name'] : $rawMemberId;
+  $checkMemberImage = $mLookup ? $mLookup['member_image'] : 'photo.png';
+
+  $throttleCheck = DB::getInstance()->prepare("
+      SELECT checkin_date 
+      FROM visitor_count 
+      WHERE (member_id = :mid OR member_id = :rawid OR member_name = :mname)
+        AND checkin_date >= :oneHourAgo
+      ORDER BY checkin_date DESC 
+      LIMIT 1
+  ");
+  $throttleCheck->execute([
+      ':mid' => $checkMemberId,
+      ':rawid' => $rawMemberId,
+      ':mname' => $checkMemberName,
+      ':oneHourAgo' => $oneHourAgo
+  ]);
+
+  if ($throttleCheck && $throttleCheck->rowCount() > 0) {
+      $throttleMsg = 'Maaf ' . $checkMemberName . ', Anda sudah presensi dalam 1 jam terakhir!';
+      die(Json::stringify([
+          'message' => $throttleMsg,
+          'image' => $checkMemberImage,
+          'status' => 'throttled',
+          'throttled' => true,
+          'member_id' => $checkMemberId,
+          'member_name' => $checkMemberName,
+          'memberName' => $checkMemberName,
+          'visit_purpose' => trim($_POST['visitPurpose'] ?? ''),
+          'visit_purpose_text' => ''
+      ])->withHeader());
+  }
+
   // sleep for a while
   sleep(0);
 
