@@ -105,12 +105,35 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_display_stats') {
         ");
         $topMonth = $topMStmt ? $topMStmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
+        // Purpose breakdown
+        $pWStmt = DB::getInstance()->query("
+            SELECT COALESCE(NULLIF(TRIM(r.name), ''), 'Lainnya') AS room_name, COUNT(*) AS total_visits
+            FROM visitor_count AS vc
+            LEFT JOIN mst_visitor_room AS r ON vc.room_code = r.unique_code
+            WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
+            GROUP BY room_name
+            ORDER BY total_visits DESC
+        ");
+        $purposeWeek = $pWStmt ? $pWStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+        $pMStmt = DB::getInstance()->query("
+            SELECT COALESCE(NULLIF(TRIM(r.name), ''), 'Lainnya') AS room_name, COUNT(*) AS total_visits
+            FROM visitor_count AS vc
+            LEFT JOIN mst_visitor_room AS r ON vc.room_code = r.unique_code
+            WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
+            GROUP BY room_name
+            ORDER BY total_visits DESC
+        ");
+        $purposeMonth = $pMStmt ? $pMStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
         die(Json::stringify([
             'today' => $today,
             'week' => $week,
             'month' => $month,
             'topWeek' => $topWeek,
-            'topMonth' => $topMonth
+            'topMonth' => $topMonth,
+            'purposeWeek' => $purposeWeek,
+            'purposeMonth' => $purposeMonth
         ])->withHeader());
     } catch (\Throwable $e) {
         die(Json::stringify(['error' => $e->getMessage()])->withHeader());

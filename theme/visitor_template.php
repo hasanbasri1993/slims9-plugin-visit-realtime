@@ -110,6 +110,9 @@ try {
 // Fetch Top Visitors Leaderboard (Week & Month) for Display Mode (&show=true)
 $topVisitorsWeek = [];
 $topVisitorsMonth = [];
+$purposeWeek = [];
+$purposeMonth = [];
+
 try {
     $topWStmt = DB::getInstance()->query("
         SELECT vc.member_id, vc.member_name, COUNT(*) AS total_visits,
@@ -138,9 +141,31 @@ try {
         LIMIT 5
     ");
     if ($topMStmt) $topVisitorsMonth = $topMStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    $pWStmt = DB::getInstance()->query("
+        SELECT COALESCE(NULLIF(TRIM(r.name), ''), 'Lainnya') AS room_name, COUNT(*) AS total_visits
+        FROM visitor_count AS vc
+        LEFT JOIN mst_visitor_room AS r ON vc.room_code = r.unique_code
+        WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
+        GROUP BY room_name
+        ORDER BY total_visits DESC
+    ");
+    if ($pWStmt) $purposeWeek = $pWStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    $pMStmt = DB::getInstance()->query("
+        SELECT COALESCE(NULLIF(TRIM(r.name), ''), 'Lainnya') AS room_name, COUNT(*) AS total_visits
+        FROM visitor_count AS vc
+        LEFT JOIN mst_visitor_room AS r ON vc.room_code = r.unique_code
+        WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
+        GROUP BY room_name
+        ORDER BY total_visits DESC
+    ");
+    if ($pMStmt) $purposeMonth = $pMStmt->fetchAll(\PDO::FETCH_ASSOC);
 } catch (\Throwable $e) {
     $topVisitorsWeek = [];
     $topVisitorsMonth = [];
+    $purposeWeek = [];
+    $purposeMonth = [];
 }
 
 // Read Announcement text from config.env
@@ -340,7 +365,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 </div>
             </div>
 
-            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics Card -->
+            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics & Purpose Charts Card -->
             <div v-if="isShowMode" class="du-card">
                 <div>
                     <h3 class="du-card-title">
@@ -365,15 +390,24 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         </div>
                     </div>
 
-                    <!-- Operational Hours Banner -->
-                    <div class="du-purpose-item active" style="margin-bottom: 0.75rem;">
-                        <div class="du-purpose-left">
-                            <div class="du-purpose-icon-bg">
-                                <i class="fas fa-clock"></i>
+                    <!-- 2 Purpose Breakdown Doughnut Charts (Minggu Ini & Bulan Ini) -->
+                    <div class="du-charts-grid">
+                        <div class="du-chart-box">
+                            <h5 class="du-chart-title">
+                                <i class="fas fa-chart-pie text-emerald-600"></i>
+                                <span>Tujuan Minggu Ini</span>
+                            </h5>
+                            <div class="du-chart-canvas-container">
+                                <canvas id="purposeWeekChart"></canvas>
                             </div>
-                            <div>
-                                <div class="du-purpose-text">Jam Operasional Layanan</div>
-                                <div style="font-size: 0.75rem; color: var(--du-emerald-700); font-weight: 700;">07:10 - 21:45 WIB</div>
+                        </div>
+                        <div class="du-chart-box">
+                            <h5 class="du-chart-title">
+                                <i class="fas fa-chart-pie text-amber-500"></i>
+                                <span>Tujuan Bulan Ini</span>
+                            </h5>
+                            <div class="du-chart-canvas-container">
+                                <canvas id="purposeMonthChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -428,7 +462,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 </div>
             </div>
 
-            <!-- Recent Visitors Live Feed -->
+            <!-- Recent Visitors Live Feed (6 Pembaca Mode in Digital Signage) -->
             <div class="du-recent-section">
                 <div class="du-recent-header">
                     <h4 class="du-recent-title">
@@ -462,6 +496,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
 <script src="<?= JWB . 'he.js' ?>"></script>
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script src="<?php echo assets('js/Speakit.1.1.0.cdn.min.js'); ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     Pusher.logToConsole = true;
@@ -492,6 +527,8 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 monthVisitorCount: <?php echo $monthVisitorCount; ?>,
                 topVisitorsWeek: <?php echo json_encode($topVisitorsWeek); ?>,
                 topVisitorsMonth: <?php echo json_encode($topVisitorsMonth); ?>,
+                purposeWeek: <?php echo json_encode($purposeWeek); ?>,
+                purposeMonth: <?php echo json_encode($purposeMonth); ?>,
                 topVisitorPeriod: 'month',
                 announcementText: <?php echo json_encode($announcementText); ?>,
                 currentTime: '',
@@ -499,7 +536,9 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 searchResults: [],
                 showAutocomplete: false,
                 selectedSearchIndex: -1,
-                searchDebounce: null
+                searchDebounce: null,
+                chartWInstance: null,
+                chartMInstance: null
             }
         },
         computed: {
@@ -508,9 +547,9 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             },
             displayedRecentVisitors: function() {
                 if (this.isShowMode) {
-                    return this.recentVisitors.slice(0, 4);
+                    return this.recentVisitors.slice(0, 6);
                 }
-                return this.recentVisitors.slice(0, 8);
+                return this.recentVisitors.slice(0, 10);
             }
         },
         mounted() {
@@ -520,6 +559,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             this.getQuotes();
 
             if (this.isShowMode) {
+                this.initCharts();
                 // Auto-rotate Top Visitors Leaderboard Tab every 8 seconds
                 setInterval(() => {
                     this.topVisitorPeriod = this.topVisitorPeriod === 'month' ? 'week' : 'month';
@@ -537,6 +577,64 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 let months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
                 this.currentDate = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
             },
+            initCharts: function() {
+                if (!this.isShowMode) return;
+                this.$nextTick(() => {
+                    let colors = ['#059669', '#facc15', '#d97706', '#0d9488', '#8b5cf6', '#ec4899'];
+
+                    // Purpose Week Chart
+                    let wLabels = (this.purposeWeek || []).map(i => i.room_name);
+                    let wData = (this.purposeWeek || []).map(i => i.total_visits);
+                    let ctxW = document.getElementById('purposeWeekChart');
+                    if (ctxW) {
+                        if (this.chartWInstance) this.chartWInstance.destroy();
+                        this.chartWInstance = new Chart(ctxW, {
+                            type: 'doughnut',
+                            data: {
+                                labels: wLabels.length ? wLabels : ['Belum ada data'],
+                                datasets: [{
+                                    data: wData.length ? wData : [1],
+                                    backgroundColor: wData.length ? colors.slice(0, wData.length) : ['#e2e8f0'],
+                                    borderWidth: 1.5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8.5 } } }
+                                }
+                            }
+                        });
+                    }
+
+                    // Purpose Month Chart
+                    let mLabels = (this.purposeMonth || []).map(i => i.room_name);
+                    let mData = (this.purposeMonth || []).map(i => i.total_visits);
+                    let ctxM = document.getElementById('purposeMonthChart');
+                    if (ctxM) {
+                        if (this.chartMInstance) this.chartMInstance.destroy();
+                        this.chartMInstance = new Chart(ctxM, {
+                            type: 'doughnut',
+                            data: {
+                                labels: mLabels.length ? mLabels : ['Belum ada data'],
+                                datasets: [{
+                                    data: mData.length ? mData : [1],
+                                    backgroundColor: mData.length ? colors.slice(0, mData.length) : ['#e2e8f0'],
+                                    borderWidth: 1.5
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8.5 } } }
+                                }
+                            }
+                        });
+                    }
+                });
+            },
             fetchDisplayStats: function() {
                 axios.get('index.php?p=visit&action=get_display_stats')
                     .then(res => {
@@ -546,6 +644,9 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                             if (res.data.month !== undefined) this.monthVisitorCount = res.data.month;
                             if (res.data.topWeek) this.topVisitorsWeek = res.data.topWeek;
                             if (res.data.topMonth) this.topVisitorsMonth = res.data.topMonth;
+                            if (res.data.purposeWeek) this.purposeWeek = res.data.purposeWeek;
+                            if (res.data.purposeMonth) this.purposeMonth = res.data.purposeMonth;
+                            this.initCharts();
                         }
                     })
                     .catch(() => {});
