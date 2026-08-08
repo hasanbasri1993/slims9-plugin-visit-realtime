@@ -32,11 +32,39 @@ if (!defined('INDEX_AUTH')) {
 $env = loadVisitPluginEnv();
 
 // Create visitor instance
+$opac = $opac ?? null;
 $visitor = new Visitor($sysconf['allowed_counter_ip'], $sysconf['time_visitor_limitation'], $opac);
 $visitor->accessCheck();
 
 // start the output buffering for main content
 ob_start();
+
+// AJAX member autocomplete search endpoint
+if (isset($_GET['action']) && $_GET['action'] === 'search_member') {
+    ob_end_clean();
+    $keywords = trim($_GET['keywords'] ?? '');
+    if (strlen($keywords) < 2) {
+        die(Json::stringify([])->withHeader());
+    }
+    
+    $kwPattern = '%' . $keywords . '%';
+    try {
+        $stmt = \SLiMS\DB::getInstance()->prepare("
+            SELECT member_id, member_name, inst_name, COALESCE(member_notes, '') AS member_notes, COALESCE(member_image, 'photo.png') AS member_image
+            FROM member
+            WHERE (is_pending = 0 OR is_pending IS NULL)
+              AND expire_date >= CURDATE()
+              AND (member_id LIKE :kw OR member_name LIKE :kw)
+            ORDER BY member_name ASC
+            LIMIT 8
+        ");
+        $stmt->execute([':kw' => $kwPattern]);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        die(Json::stringify($results)->withHeader());
+    } catch (\Throwable $e) {
+        die(Json::stringify([])->withHeader());
+    }
+}
 
 if (isset($_POST['counter'])) {
 
@@ -139,11 +167,14 @@ if (isset($_POST['counter'])) {
   // from the Pusher event it triggered on itself.
   $pusher->trigger($pusherChannel, $pusherEvent, $data, $_POST['socket_id'] ?? null);
 
-  // send response with visit purpose
+  // send response with visit purpose and member details
   die(Json::stringify([
     'message' => $message, 
     'image' => $image, 
     'status' => $visitor->getError(),
+    'member_id' => $memberId ?? trim($_POST['memberID']),
+    'member_name' => $memberName ?? trim($_POST['memberID']),
+    'memberName' => $memberName ?? trim($_POST['memberID']),
     'visit_purpose' => $visitPurpose,
     'visit_purpose_text' => $visitPurposeText
   ])->withHeader());
