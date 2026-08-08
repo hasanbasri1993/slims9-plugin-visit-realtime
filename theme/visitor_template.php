@@ -179,7 +179,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
     <!-- Audio / TTS Initialization Modal -->
     <div v-if="!ttsInitialized && !isShowMode" class="du-modal-overlay">
         <div class="du-modal-content">
-            <img src="<?php echo assets('images/logo.png'); ?>" alt="Logo Daarul 'Uluum Lido" class="du-modal-logo">
+            <img src="<?php echo assets('images/logo.webp'); ?>" alt="Logo Daarul 'Uluum Lido" class="du-modal-logo">
             <h3 class="du-modal-title"><?= $sysconf['library_name']; ?></h3>
             <p class="du-modal-desc"><?= __('Ketuk Lanjutkan untuk mengaktifkan sambutan suara dan memulai anjungan presensi.') ?></p>
             <button type="button" class="du-btn-primary" @click="initTTS">
@@ -194,7 +194,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
         <!-- Idle Header: Logo, Institution Title & Digital Clock -->
         <div v-show="textInfo === ''" class="du-header-idle">
             <div class="du-logo-wrapper">
-                <img src="<?php echo assets('images/logo.png'); ?>" alt="Pesantren Modern Daarul 'Uluum Lido" class="du-logo-img">
+                <img src="<?php echo assets('images/logo.webp'); ?>" alt="Pesantren Modern Daarul 'Uluum Lido" class="du-logo-img">
             </div>
             <h1 class="du-institution-name">PESANTREN MODERN DAARUL 'ULUUM LIDO BOGOR</h1>
             <div class="du-kiosk-tagline">

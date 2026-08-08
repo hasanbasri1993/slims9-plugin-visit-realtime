@@ -14,10 +14,10 @@ if (!$sysconf['template']['classic_library_disableslide']):
         transition: '<?= $sysconf['template']['classic_slide_transition']; ?>',
         animation: '<?= $sysconf['template']['classic_slide_animation']; ?>',
         slides: [
-            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide1.jpg'); ?>" },
-            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide2.jpg'); ?>" },
-            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide3.jpg'); ?>" },
-            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide4.jpg'); ?>" }
+            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide1.webp'); ?>" },
+            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide2.webp'); ?>" },
+            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide3.webp'); ?>" },
+            { src: "<?php echo CURRENT_TEMPLATE_DIR . v('assets/images/slide4.webp'); ?>" }
         ]
     });
 </script>
