@@ -365,7 +365,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 </div>
             </div>
 
-            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics & Vertically Stacked Purpose Charts Card -->
+            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics & 3D Progress Bar Purpose Charts -->
             <div v-if="isShowMode" class="du-card">
                 <div>
                     <h3 class="du-card-title">
@@ -390,24 +390,45 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         </div>
                     </div>
 
-                    <!-- 2 Purpose Breakdown Doughnut Charts (Vertically Stacked: Week ON TOP, Month BELOW IT) -->
+                    <!-- 3D Bar Progress Charts with Direct Value Badges (Week on TOP, Month BELOW IT) -->
                     <div class="du-charts-grid-stacked">
+                        <!-- Chart Minggu Ini -->
                         <div class="du-chart-box-stacked">
                             <h5 class="du-chart-title-stacked">
-                                <i class="fas fa-chart-pie text-emerald-600"></i>
+                                <i class="fas fa-chart-bar text-emerald-600"></i>
                                 <span>Tujuan Minggu Ini</span>
                             </h5>
-                            <div class="du-chart-canvas-container-stacked">
-                                <canvas id="purposeWeekChart"></canvas>
+                            <div class="du-bar-chart-list">
+                                <div v-for="item in purposeWeek" :key="item.room_name" class="du-bar-item">
+                                    <div class="du-bar-label-row">
+                                        <span class="du-bar-name">{{ item.room_name }}</span>
+                                        <span class="du-bar-value-badge">{{ item.total_visits }} Kunjungan</span>
+                                    </div>
+                                    <div class="du-bar-track">
+                                        <div class="du-bar-fill-3d" :style="{ width: getPercentage(item.total_visits, weekVisitorCount) + '%' }"></div>
+                                    </div>
+                                </div>
+                                <div v-if="!purposeWeek || purposeWeek.length === 0" class="text-xs text-slate-500 text-center py-1">Belum ada data kunjungan minggu ini</div>
                             </div>
                         </div>
+
+                        <!-- Chart Bulan Ini -->
                         <div class="du-chart-box-stacked">
                             <h5 class="du-chart-title-stacked">
-                                <i class="fas fa-chart-pie text-amber-500"></i>
+                                <i class="fas fa-chart-bar text-amber-500"></i>
                                 <span>Tujuan Bulan Ini</span>
                             </h5>
-                            <div class="du-chart-canvas-container-stacked">
-                                <canvas id="purposeMonthChart"></canvas>
+                            <div class="du-bar-chart-list">
+                                <div v-for="item in purposeMonth" :key="item.room_name" class="du-bar-item">
+                                    <div class="du-bar-label-row">
+                                        <span class="du-bar-name">{{ item.room_name }}</span>
+                                        <span class="du-bar-value-badge du-bar-gold">{{ item.total_visits }} Kunjungan</span>
+                                    </div>
+                                    <div class="du-bar-track">
+                                        <div class="du-bar-fill-3d-gold" :style="{ width: getPercentage(item.total_visits, monthVisitorCount) + '%' }"></div>
+                                    </div>
+                                </div>
+                                <div v-if="!purposeMonth || purposeMonth.length === 0" class="text-xs text-slate-500 text-center py-1">Belum ada data kunjungan bulan ini</div>
                             </div>
                         </div>
                     </div>
@@ -496,7 +517,6 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
 <script src="<?= JWB . 'he.js' ?>"></script>
 <script src="https://js.pusher.com/8.4.0/pusher.min.js"></script>
 <script src="<?php echo assets('js/Speakit.1.1.0.cdn.min.js'); ?>"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     Pusher.logToConsole = true;
@@ -536,9 +556,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 searchResults: [],
                 showAutocomplete: false,
                 selectedSearchIndex: -1,
-                searchDebounce: null,
-                chartWInstance: null,
-                chartMInstance: null
+                searchDebounce: null
             }
         },
         computed: {
@@ -559,7 +577,6 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             this.getQuotes();
 
             if (this.isShowMode) {
-                this.initCharts();
                 // Auto-rotate Top Visitors Leaderboard Tab every 8 seconds
                 setInterval(() => {
                     this.topVisitorPeriod = this.topVisitorPeriod === 'month' ? 'week' : 'month';
@@ -577,63 +594,10 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 let months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
                 this.currentDate = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
             },
-            initCharts: function() {
-                if (!this.isShowMode) return;
-                this.$nextTick(() => {
-                    let colors = ['#059669', '#facc15', '#d97706', '#0d9488', '#8b5cf6', '#ec4899'];
-
-                    // Purpose Week Chart (Stacked Row: Legend on right)
-                    let wLabels = (this.purposeWeek || []).map(i => i.room_name);
-                    let wData = (this.purposeWeek || []).map(i => i.total_visits);
-                    let ctxW = document.getElementById('purposeWeekChart');
-                    if (ctxW) {
-                        if (this.chartWInstance) this.chartWInstance.destroy();
-                        this.chartWInstance = new Chart(ctxW, {
-                            type: 'doughnut',
-                            data: {
-                                labels: wLabels.length ? wLabels : ['Belum ada data'],
-                                datasets: [{
-                                    data: wData.length ? wData : [1],
-                                    backgroundColor: wData.length ? colors.slice(0, wData.length) : ['#e2e8f0'],
-                                    borderWidth: 1.5
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { position: 'right', labels: { boxWidth: 8, font: { size: 8.5 } } }
-                                }
-                            }
-                        });
-                    }
-
-                    // Purpose Month Chart (Stacked Row: Legend on right)
-                    let mLabels = (this.purposeMonth || []).map(i => i.room_name);
-                    let mData = (this.purposeMonth || []).map(i => i.total_visits);
-                    let ctxM = document.getElementById('purposeMonthChart');
-                    if (ctxM) {
-                        if (this.chartMInstance) this.chartMInstance.destroy();
-                        this.chartMInstance = new Chart(ctxM, {
-                            type: 'doughnut',
-                            data: {
-                                labels: mLabels.length ? mLabels : ['Belum ada data'],
-                                datasets: [{
-                                    data: mData.length ? mData : [1],
-                                    backgroundColor: mData.length ? colors.slice(0, mData.length) : ['#e2e8f0'],
-                                    borderWidth: 1.5
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: { position: 'right', labels: { boxWidth: 8, font: { size: 8.5 } } }
-                                }
-                            }
-                        });
-                    }
-                });
+            getPercentage: function(val, total) {
+                if (!total || total <= 0) return 0;
+                let pct = Math.round((val / total) * 100);
+                return pct > 100 ? 100 : (pct < 8 ? 8 : pct);
             },
             fetchDisplayStats: function() {
                 axios.get('index.php?p=visit&action=get_display_stats')
@@ -646,7 +610,6 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                             if (res.data.topMonth) this.topVisitorsMonth = res.data.topMonth;
                             if (res.data.purposeWeek) this.purposeWeek = res.data.purposeWeek;
                             if (res.data.purposeMonth) this.purposeMonth = res.data.purposeMonth;
-                            this.initCharts();
                         }
                     })
                     .catch(() => {});

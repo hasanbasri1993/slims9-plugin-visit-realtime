@@ -512,7 +512,7 @@ body {
   margin-top: 0.12rem;
 }
 
-/* Vertically Stacked Purpose Charts (Week ON TOP, Month BELOW IT) */
+/* 3D Gradient Progress Bar Charts for Visit Purposes */
 .du-charts-grid-stacked {
   display: flex;
   flex-direction: column;
@@ -524,11 +524,10 @@ body {
   background: var(--du-slate-50);
   border: 1.5px solid var(--du-slate-200);
   border-radius: var(--du-radius-lg);
-  padding: 0.35rem 0.65rem;
+  padding: 0.5rem 0.75rem;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 0.35rem;
   box-sizing: border-box;
   width: 100%;
 }
@@ -538,23 +537,80 @@ body {
   font-weight: 800;
   color: var(--du-emerald-950);
   margin: 0;
-  width: 130px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0.35rem;
 }
 
-.du-chart-canvas-container-stacked {
-  position: relative;
-  flex: 1;
-  height: 95px;
+.du-bar-chart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
 }
 
-@media (min-width: 1400px) {
-  .du-chart-canvas-container-stacked {
-    height: 110px;
-  }
+.du-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+}
+
+.du-bar-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.725rem;
+  font-weight: 700;
+}
+
+.du-bar-name {
+  color: var(--du-slate-800);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+}
+
+.du-bar-value-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--du-emerald-800);
+  background: var(--du-emerald-100);
+  padding: 0.05rem 0.45rem;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+.du-bar-value-badge.du-bar-gold {
+  color: var(--du-gold-600);
+  background: var(--du-gold-100);
+}
+
+.du-bar-track {
+  width: 100%;
+  height: 9px;
+  background: var(--du-slate-200);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.du-bar-fill-3d {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+  box-shadow: 0 1px 4px rgba(4, 120, 87, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.du-bar-fill-3d-gold {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #facc15 0%, #d97706 100%);
+  box-shadow: 0 1px 4px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Leaderboard Hall of Fame - Compact Fit */
