@@ -229,7 +229,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
     </header>
 
     <!-- Running Announcement Ticker Bar (When in Display Mode &show=true) -->
-    <div v-if="isShowMode" class="du-announcement-ticker">
+    <div class="du-announcement-ticker">
         <div class="du-announcement-badge">
             <i class="fas fa-bullhorn text-white"></i>
             <span>PENGUMUMAN</span>
@@ -444,7 +444,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
         <!-- Right Side Column -->
         <div class="du-right-col">
             <!-- Display Mode (&show=true): Top 3 Visitors Hall of Fame / Leaderboard Card -->
-            <div v-if="isShowMode" class="du-leaderboard-card">
+            <div class="du-leaderboard-card">
                 <div class="du-leaderboard-header">
                     <h4 class="du-leaderboard-title">
                         <i class="fas fa-trophy text-amber-500"></i>
