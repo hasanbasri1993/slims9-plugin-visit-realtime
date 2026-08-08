@@ -69,6 +69,54 @@ if (isset($_GET['action']) && $_GET['action'] === 'search_member') {
     }
 }
 
+// AJAX Digital Signage background stats refresh endpoint
+if (isset($_GET['action']) && $_GET['action'] === 'get_display_stats') {
+    ob_end_clean();
+    try {
+        $today = (int)DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE DATE(checkin_date) = CURRENT_DATE()")->fetchColumn();
+        $week = (int)DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE YEARWEEK(checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)")->fetchColumn();
+        $month = (int)DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE YEAR(checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(checkin_date) = MONTH(CURRENT_DATE())")->fetchColumn();
+
+        $topWStmt = DB::getInstance()->query("
+            SELECT vc.member_id, vc.member_name, COUNT(*) AS total_visits,
+                   COALESCE(m.inst_name, '') AS inst_name,
+                   COALESCE(m.member_image, 'photo.png') AS member_image,
+                   COALESCE(m.member_notes, '') AS member_notes
+            FROM visitor_count AS vc
+            LEFT JOIN member AS m ON vc.member_id = m.member_id
+            WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
+            GROUP BY vc.member_id, vc.member_name
+            ORDER BY total_visits DESC
+            LIMIT 5
+        ");
+        $topWeek = $topWStmt ? $topWStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+        $topMStmt = DB::getInstance()->query("
+            SELECT vc.member_id, vc.member_name, COUNT(*) AS total_visits,
+                   COALESCE(m.inst_name, '') AS inst_name,
+                   COALESCE(m.member_image, 'photo.png') AS member_image,
+                   COALESCE(m.member_notes, '') AS member_notes
+            FROM visitor_count AS vc
+            LEFT JOIN member AS m ON vc.member_id = m.member_id
+            WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
+            GROUP BY vc.member_id, vc.member_name
+            ORDER BY total_visits DESC
+            LIMIT 5
+        ");
+        $topMonth = $topMStmt ? $topMStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+        die(Json::stringify([
+            'today' => $today,
+            'week' => $week,
+            'month' => $month,
+            'topWeek' => $topWeek,
+            'topMonth' => $topMonth
+        ])->withHeader());
+    } catch (\Throwable $e) {
+        die(Json::stringify(['error' => $e->getMessage()])->withHeader());
+    }
+}
+
 if (isset($_POST['counter'])) {
 
   if (!isset($_POST['memberID']) || trim($_POST['memberID']) == '') {
@@ -189,6 +237,6 @@ require __DIR__ . '/theme/visitor_template.php';
 // main content
 $main_content = ob_get_clean();
 // page title
-$page_title = ($isShowMode ? __('Display Informasi Presensi') : __('Visitor Counter')) . ' | ' . $sysconf['library_name'];
+$page_title = ($isShowMode ? __('Digital Signage Board') : __('Visitor Counter')) . ' | ' . $sysconf['library_name'];
 require $main_template_path;
 exit();

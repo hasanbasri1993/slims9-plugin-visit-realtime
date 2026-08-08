@@ -71,7 +71,7 @@ body {
   padding-bottom: 2rem;
 }
 
-/* Kiosk Layout Container */
+/* Digital Signage Viewport Container */
 .du-container {
   width: 100%;
   max-width: 1480px;
@@ -109,6 +109,48 @@ body {
   animation: du-fade-in 0.3s ease-out;
   background: transparent;
   width: 100%;
+}
+
+/* Digital Signage Pulse Indicator */
+.du-signage-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(2, 44, 34, 0.85);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  padding: 0.2rem 0.75rem;
+  border-radius: 20px;
+  color: var(--du-emerald-100);
+  font-size: 0.725rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.du-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--du-emerald-500);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: du-pulse 1.8s infinite;
+}
+
+@keyframes du-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
 }
 
 /* Live Digital Clock Badge */

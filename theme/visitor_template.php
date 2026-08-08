@@ -177,6 +177,12 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 <span><?= $sysconf['library_name']; ?> — {{ isShowMode ? 'Display Informasi Presensi' : 'Anjungan Presensi Presisi' }}</span>
             </div>
 
+            <!-- Digital Signage Live Status Pulse Badge -->
+            <div v-if="isShowMode" class="du-signage-live-badge">
+                <span class="du-pulse-dot"></span>
+                <span>LIVE DIGITAL SIGNAGE BOARD</span>
+            </div>
+
             <!-- Live Digital Clock Widget -->
             <div class="du-clock-widget">
                 <i class="far fa-clock text-amber-400"></i>
@@ -506,6 +512,16 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             setInterval(this.updateClock, 1000);
             this.pusherInit();
             this.getQuotes();
+
+            if (this.isShowMode) {
+                // Auto-rotate Top Visitors Leaderboard Tab every 8 seconds
+                setInterval(() => {
+                    this.topVisitorPeriod = this.topVisitorPeriod === 'month' ? 'week' : 'month';
+                }, 8000);
+
+                // Auto-refresh background stats every 30 seconds for Digital Signage displays
+                setInterval(this.fetchDisplayStats, 30000);
+            }
         },
         methods: {
             updateClock: function() {
@@ -514,6 +530,19 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 let days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
                 let months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
                 this.currentDate = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            },
+            fetchDisplayStats: function() {
+                axios.get('index.php?p=visit&action=get_display_stats')
+                    .then(res => {
+                        if (res.data) {
+                            if (res.data.today !== undefined) this.todayVisitorCount = res.data.today;
+                            if (res.data.week !== undefined) this.weekVisitorCount = res.data.week;
+                            if (res.data.month !== undefined) this.monthVisitorCount = res.data.month;
+                            if (res.data.topWeek) this.topVisitorsWeek = res.data.topWeek;
+                            if (res.data.topMonth) this.topVisitorsMonth = res.data.topMonth;
+                        }
+                    })
+                    .catch(() => {});
             },
             pusherInit: function() {
                 var self = this;
