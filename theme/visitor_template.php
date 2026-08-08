@@ -237,8 +237,8 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
     <!-- Running Announcement Ticker Bar (When in Display Mode &show=true) -->
     <div v-if="isShowMode" class="du-announcement-ticker">
         <div class="du-announcement-badge">
-            <i class="fas fa-bullhorn text-amber-400"></i>
-            <span>Pengumuman</span>
+            <i class="fas fa-bullhorn text-white"></i>
+            <span>PENGUMUMAN</span>
         </div>
         <div class="du-announcement-marquee">
             <marquee behavior="scroll" direction="left" scrollamount="6">{{ announcementText }}</marquee>
@@ -365,7 +365,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 </div>
             </div>
 
-            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics & Purpose Charts Card -->
+            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics & Vertically Stacked Purpose Charts Card -->
             <div v-if="isShowMode" class="du-card">
                 <div>
                     <h3 class="du-card-title">
@@ -390,23 +390,23 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         </div>
                     </div>
 
-                    <!-- 2 Purpose Breakdown Doughnut Charts (Minggu Ini & Bulan Ini) -->
-                    <div class="du-charts-grid">
-                        <div class="du-chart-box">
-                            <h5 class="du-chart-title">
+                    <!-- 2 Purpose Breakdown Doughnut Charts (Vertically Stacked: Week ON TOP, Month BELOW IT) -->
+                    <div class="du-charts-grid-stacked">
+                        <div class="du-chart-box-stacked">
+                            <h5 class="du-chart-title-stacked">
                                 <i class="fas fa-chart-pie text-emerald-600"></i>
                                 <span>Tujuan Minggu Ini</span>
                             </h5>
-                            <div class="du-chart-canvas-container">
+                            <div class="du-chart-canvas-container-stacked">
                                 <canvas id="purposeWeekChart"></canvas>
                             </div>
                         </div>
-                        <div class="du-chart-box">
-                            <h5 class="du-chart-title">
+                        <div class="du-chart-box-stacked">
+                            <h5 class="du-chart-title-stacked">
                                 <i class="fas fa-chart-pie text-amber-500"></i>
                                 <span>Tujuan Bulan Ini</span>
                             </h5>
-                            <div class="du-chart-canvas-container">
+                            <div class="du-chart-canvas-container-stacked">
                                 <canvas id="purposeMonthChart"></canvas>
                             </div>
                         </div>
@@ -582,7 +582,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 this.$nextTick(() => {
                     let colors = ['#059669', '#facc15', '#d97706', '#0d9488', '#8b5cf6', '#ec4899'];
 
-                    // Purpose Week Chart
+                    // Purpose Week Chart (Stacked Row: Legend on right)
                     let wLabels = (this.purposeWeek || []).map(i => i.room_name);
                     let wData = (this.purposeWeek || []).map(i => i.total_visits);
                     let ctxW = document.getElementById('purposeWeekChart');
@@ -602,13 +602,13 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {
-                                    legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8.5 } } }
+                                    legend: { position: 'right', labels: { boxWidth: 8, font: { size: 8.5 } } }
                                 }
                             }
                         });
                     }
 
-                    // Purpose Month Chart
+                    // Purpose Month Chart (Stacked Row: Legend on right)
                     let mLabels = (this.purposeMonth || []).map(i => i.room_name);
                     let mData = (this.purposeMonth || []).map(i => i.total_visits);
                     let ctxM = document.getElementById('purposeMonthChart');
@@ -628,7 +628,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                                 responsive: true,
                                 maintainAspectRatio: false,
                                 plugins: {
-                                    legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 8.5 } } }
+                                    legend: { position: 'right', labels: { boxWidth: 8, font: { size: 8.5 } } }
                                 }
                             }
                         });
