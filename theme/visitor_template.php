@@ -435,11 +435,11 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         <i class="fas fa-users text-emerald-600"></i>
                         <span>Pengunjung Terakhir</span>
                     </h4>
-                    <span class="du-recent-badge">{{ recentVisitors.length }} Terbaca</span>
+                    <span class="du-recent-badge">{{ displayedRecentVisitors.length }} Terbaca</span>
                 </div>
 
-                <div v-if="recentVisitors.length > 0" class="du-visitor-grid">
-                    <div v-for="visitor in recentVisitors" :key="visitor.visitor_id" class="du-visitor-item">
+                <div v-if="displayedRecentVisitors.length > 0" class="du-visitor-grid">
+                    <div v-for="visitor in displayedRecentVisitors" :key="visitor.visitor_id" class="du-visitor-item">
                         <img :src="getVisitorImage(visitor.member_image)" alt="Avatar" class="du-v-avatar" @error="onGridImageError($event)">
                         <div class="du-v-info">
                             <h5 class="du-v-name">{{ visitor.member_name }}</h5>
@@ -505,6 +505,12 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
         computed: {
             activeTopVisitors: function() {
                 return this.topVisitorPeriod === 'week' ? this.topVisitorsWeek : this.topVisitorsMonth;
+            },
+            displayedRecentVisitors: function() {
+                if (this.isShowMode) {
+                    return this.recentVisitors.slice(0, 4);
+                }
+                return this.recentVisitors.slice(0, 8);
             }
         },
         mounted() {

@@ -55,9 +55,11 @@
 }
 
 html, body {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden !important;
 }
 
 body {
@@ -68,35 +70,37 @@ body {
   color: var(--du-slate-900);
   position: relative;
   z-index: 1;
-  padding-bottom: 2rem;
+  overflow: hidden !important;
 }
 
-/* Digital Signage Viewport Container */
+/* Digital Signage Viewport Container - Zero Scroll */
 .du-container {
   width: 100%;
   max-width: 1480px;
   margin: 0 auto;
-  padding: 1rem 1.35rem;
+  padding: 0.75rem 1.25rem;
   box-sizing: border-box;
   position: relative;
   z-index: 10;
-  min-height: calc(100vh - 2rem);
+  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 @media (min-width: 1680px) {
   .du-container {
     max-width: 1680px;
-    padding: 1.35rem 2rem;
+    padding: 1rem 1.75rem;
   }
 }
 
 /* Header Row & Live Digital Clock */
 .du-header {
   text-align: center;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.5rem;
   position: relative;
   width: 100%;
   flex-shrink: 0;
@@ -118,20 +122,20 @@ body {
   gap: 0.45rem;
   background: rgba(2, 44, 34, 0.85);
   border: 1px solid rgba(16, 185, 129, 0.4);
-  padding: 0.2rem 0.75rem;
+  padding: 0.15rem 0.65rem;
   border-radius: 20px;
   color: var(--du-emerald-100);
-  font-size: 0.725rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .du-pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background-color: var(--du-emerald-500);
   border-radius: 50%;
   box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
@@ -160,29 +164,29 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(234, 179, 8, 0.4);
   border-radius: 30px;
-  padding: 0.35rem 1.1rem;
+  padding: 0.25rem 0.95rem;
   color: #ffffff;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin-top: 0.35rem;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
 }
 
 .du-clock-time {
   font-family: var(--du-font-sans);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--du-gold-400);
   letter-spacing: 0.04em;
 }
 
 .du-clock-date {
-  font-size: 0.8rem;
+  font-size: 0.775rem;
   font-weight: 600;
   color: #f8fafc;
   border-left: 1px solid rgba(255, 255, 255, 0.25);
-  padding-left: 0.65rem;
+  padding-left: 0.55rem;
 }
 
 /* Horizontal Active Greeting Banner */
@@ -190,16 +194,16 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 1.35rem;
+  gap: 1.2rem;
   text-align: left;
   animation: du-pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 2px solid var(--du-emerald-500);
-  padding: 0.85rem 1.5rem;
+  padding: 0.65rem 1.25rem;
   box-shadow: 0 12px 30px rgba(4, 120, 87, 0.2);
-  max-width: 920px;
+  max-width: 900px;
   margin: 0 auto;
   border-radius: var(--du-radius-xl);
   box-sizing: border-box;
@@ -222,12 +226,12 @@ body {
 
 .du-logo-wrapper {
   position: relative;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.15rem;
 }
 
 .du-logo-img {
-  width: 68px;
-  height: 68px;
+  width: 58px;
+  height: 58px;
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.32));
   transition: transform 0.25s ease;
@@ -235,8 +239,8 @@ body {
 
 @media (min-width: 1400px) {
   .du-logo-img {
-    width: 80px;
-    height: 80px;
+    width: 68px;
+    height: 68px;
   }
 }
 
@@ -246,13 +250,13 @@ body {
 
 /* Institutional Title with Text Outline / Outfill */
 .du-institution-name {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: 0.02em;
-  margin: 0 0 0.2rem 0;
+  margin: 0 0 0.15rem 0;
   text-transform: uppercase;
-  -webkit-text-stroke: 1.3px #022c22;
+  -webkit-text-stroke: 1.2px #022c22;
   text-shadow: 
     0 2px 6px rgba(0, 0, 0, 0.9),
     0 0 12px rgba(2, 44, 34, 0.8),
@@ -264,25 +268,25 @@ body {
 
 @media (min-width: 1400px) {
   .du-institution-name {
-    font-size: 1.65rem;
-    -webkit-text-stroke: 1.6px #022c22;
+    font-size: 1.45rem;
+    -webkit-text-stroke: 1.4px #022c22;
   }
 }
 
 .du-kiosk-tagline {
-  font-size: 0.8rem;
+  font-size: 0.775rem;
   font-weight: 700;
   color: #ffffff;
   background: rgba(6, 78, 59, 0.88);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(234, 179, 8, 0.4);
-  padding: 0.2rem 0.85rem;
+  padding: 0.15rem 0.75rem;
   border-radius: 30px;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  gap: 0.35rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 .du-kiosk-tagline i {
@@ -296,11 +300,11 @@ body {
   -webkit-backdrop-filter: blur(14px);
   border: 1.5px solid rgba(234, 179, 8, 0.45);
   border-radius: var(--du-radius-lg);
-  padding: 0.4rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.85rem;
+  gap: 0.65rem;
+  margin-bottom: 0.6rem;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
   flex-shrink: 0;
 }
@@ -308,13 +312,13 @@ body {
 .du-announcement-badge {
   background: rgba(2, 44, 34, 0.8);
   color: var(--du-gold-400);
-  font-size: 0.75rem;
+  font-size: 0.725rem;
   font-weight: 800;
-  padding: 0.2rem 0.65rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 20px;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   flex-shrink: 0;
 }
 
@@ -322,37 +326,39 @@ body {
   flex: 1;
   min-width: 0;
   color: #ffffff;
-  font-size: 0.825rem;
+  font-size: 0.8rem;
   font-weight: 600;
 }
 
-/* Main Grid Layout */
+/* Main Grid Layout - Zero Scroll Fit */
 .du-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.15rem;
+  gap: 0.85rem;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   align-items: stretch;
 }
 
 @media (min-width: 992px) {
   .du-grid {
     grid-template-columns: 490px 1fr;
-    gap: 1.35rem;
+    gap: 1.15rem;
   }
 }
 
 @media (min-width: 1400px) {
   .du-grid {
     grid-template-columns: 550px 1fr;
-    gap: 1.75rem;
+    gap: 1.35rem;
   }
 }
 
 @media (min-width: 1680px) {
   .du-grid {
     grid-template-columns: 600px 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }
 
@@ -360,23 +366,27 @@ body {
 .du-left-col {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.65rem;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Right Column wrapper */
 .du-right-col {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.65rem;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Summary Kiosk Stats Counter Bar */
 .du-stats-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
+  gap: 0.55rem;
   flex-shrink: 0;
 }
 
@@ -386,25 +396,25 @@ body {
   -webkit-backdrop-filter: blur(12px);
   border-radius: var(--du-radius-lg);
   border: 1.5px solid rgba(6, 95, 70, 0.12);
-  padding: 0.65rem 0.85rem;
+  padding: 0.55rem 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
   box-shadow: 0 3px 10px rgba(2, 44, 34, 0.04);
   min-width: 0;
   box-sizing: border-box;
 }
 
 .du-stat-icon {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   background: var(--du-emerald-100);
   color: var(--du-emerald-800);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   flex-shrink: 0;
 }
 
@@ -415,7 +425,7 @@ body {
 }
 
 .du-stat-val {
-  font-size: 0.925rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: var(--du-emerald-950);
   line-height: 1.15;
@@ -424,7 +434,7 @@ body {
 }
 
 .du-stat-time {
-  font-size: 0.825rem;
+  font-size: 0.8rem;
   font-weight: 800;
   color: var(--du-emerald-950);
   letter-spacing: -0.02em;
@@ -434,7 +444,7 @@ body {
 }
 
 .du-stat-val-sm {
-  font-size: 0.775rem;
+  font-size: 0.75rem;
   font-weight: 800;
   color: var(--du-emerald-950);
   line-height: 1.2;
@@ -444,7 +454,7 @@ body {
 }
 
 .du-stat-lbl {
-  font-size: 0.65rem;
+  font-size: 0.625rem;
   font-weight: 600;
   color: var(--du-slate-600);
   margin-top: 0.1rem;
@@ -457,35 +467,35 @@ body {
 .du-display-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.65rem;
-  margin-bottom: 0.85rem;
+  gap: 0.55rem;
+  margin-bottom: 0.65rem;
 }
 
 .du-display-stat-card {
   background: linear-gradient(135deg, var(--du-emerald-900) 0%, var(--du-emerald-950) 100%);
   border: 1.5px solid rgba(234, 179, 8, 0.35);
   border-radius: var(--du-radius-lg);
-  padding: 0.75rem 0.65rem;
+  padding: 0.65rem 0.55rem;
   text-align: center;
   color: #ffffff;
   box-shadow: 0 4px 12px rgba(2, 44, 34, 0.2);
 }
 
 .du-display-stat-num {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--du-gold-400);
   line-height: 1.1;
 }
 
 .du-display-stat-label {
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   font-weight: 700;
   color: var(--du-emerald-100);
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
 }
 
-/* Leaderboard Hall of Fame */
+/* Leaderboard Hall of Fame - Compact Fit */
 .du-leaderboard-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
@@ -493,38 +503,39 @@ body {
   border-radius: var(--du-radius-xl);
   border: 1.5px solid rgba(6, 95, 70, 0.12);
   box-shadow: var(--du-shadow-card);
-  padding: 1.15rem 1.35rem;
-  margin-bottom: 0.85rem;
+  padding: 0.85rem 1.15rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .du-leaderboard-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
   border-bottom: 1.5px solid var(--du-slate-200);
 }
 
 .du-leaderboard-title {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--du-emerald-950);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
 }
 
 .du-leaderboard-tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .du-tab-btn {
-  font-size: 0.725rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 0.2rem 0.65rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 20px;
   border: 1px solid var(--du-slate-200);
   background: var(--du-slate-100);
@@ -542,14 +553,14 @@ body {
 .du-leaderboard-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .du-leader-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0.85rem;
+  gap: 0.6rem;
+  padding: 0.35rem 0.65rem;
   background: var(--du-slate-50);
   border: 1.5px solid var(--du-slate-200);
   border-radius: var(--du-radius-lg);
@@ -562,10 +573,10 @@ body {
 }
 
 .du-rank-badge {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
   display: flex;
   align-items: center;
@@ -580,8 +591,8 @@ body {
 .du-rank-other { background: var(--du-emerald-700); }
 
 .du-leader-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid var(--du-emerald-600);
@@ -594,7 +605,7 @@ body {
 }
 
 .du-leader-name {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--du-slate-900);
   white-space: nowrap;
@@ -604,16 +615,16 @@ body {
 }
 
 .du-leader-meta {
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   color: var(--du-slate-600);
 }
 
 .du-leader-count-badge {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
   color: var(--du-emerald-800);
   background: var(--du-emerald-100);
-  padding: 0.15rem 0.55rem;
+  padding: 0.12rem 0.5rem;
   border-radius: 12px;
   white-space: nowrap;
 }
@@ -626,50 +637,51 @@ body {
   border-radius: var(--du-radius-xl);
   border: 1.5px solid rgba(6, 95, 70, 0.12);
   box-shadow: var(--du-shadow-card);
-  padding: 1.25rem 1.45rem;
+  padding: 1.1rem 1.3rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: visible;
   flex: 1;
+  min-height: 0;
 }
 
 @media (min-width: 1400px) {
   .du-card {
-    padding: 1.5rem 1.75rem;
+    padding: 1.25rem 1.5rem;
   }
 }
 
 .du-card-title {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: var(--du-emerald-950);
-  margin: 0 0 0.25rem 0;
+  margin: 0 0 0.2rem 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 .du-card-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.775rem;
   color: var(--du-slate-600);
-  margin: 0 0 0.85rem 0;
-  line-height: 1.35;
+  margin: 0 0 0.65rem 0;
+  line-height: 1.3;
 }
 
 /* Form Controls */
 .du-form-group {
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.65rem;
   position: relative;
 }
 
 .du-label {
   display: block;
-  font-size: 0.825rem;
+  font-size: 0.775rem;
   font-weight: 700;
   color: var(--du-emerald-900);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
 }
 
 .du-input-group {
@@ -678,19 +690,19 @@ body {
 
 .du-input-icon {
   position: absolute;
-  left: 0.95rem;
+  left: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--du-emerald-700);
-  font-size: 1rem;
+  font-size: 0.9rem;
   pointer-events: none;
 }
 
 .du-input {
   width: 100%;
-  padding: 0.7rem 0.85rem 0.7rem 2.6rem;
+  padding: 0.6rem 0.75rem 0.6rem 2.4rem;
   font-family: var(--du-font-sans);
-  font-size: 0.925rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--du-slate-900);
   background: var(--du-slate-100);
@@ -718,16 +730,16 @@ body {
   border-radius: var(--du-radius-lg);
   border: 1.5px solid var(--du-emerald-500);
   box-shadow: 0 12px 28px rgba(2, 44, 34, 0.2);
-  max-height: 280px;
+  max-height: 250px;
   overflow-y: auto;
-  padding: 0.3rem 0;
+  padding: 0.25rem 0;
 }
 
 .du-autocomplete-item {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem 0.85rem;
+  gap: 0.6rem;
+  padding: 0.45rem 0.75rem;
   cursor: pointer;
   transition: background 0.15s ease;
   border-bottom: 1px solid var(--du-slate-100);
@@ -743,8 +755,8 @@ body {
 }
 
 .du-ac-avatar {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid var(--du-emerald-600);
@@ -757,7 +769,7 @@ body {
 }
 
 .du-ac-name {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--du-slate-900);
   white-space: nowrap;
@@ -766,22 +778,22 @@ body {
 }
 
 .du-ac-meta {
-  font-size: 0.725rem;
+  font-size: 0.7rem;
   color: var(--du-slate-600);
 }
 
 .du-ac-note {
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   font-weight: 600;
   color: var(--du-gold-600);
   background: var(--du-gold-50);
   border: 1px solid rgba(217, 119, 6, 0.25);
-  padding: 0.1rem 0.45rem;
+  padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.2rem;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -789,7 +801,7 @@ body {
 }
 
 .du-ac-arrow {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--du-slate-400);
   margin-left: auto;
 }
@@ -798,7 +810,7 @@ body {
 .du-purpose-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.55rem;
+  gap: 0.45rem;
   box-sizing: border-box;
 }
 
@@ -806,14 +818,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.55rem 0.7rem;
+  padding: 0.45rem 0.6rem;
   background: var(--du-slate-100);
   border: 1.5px solid var(--du-slate-200);
   border-radius: var(--du-radius-md);
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
-  min-height: 48px;
+  min-height: 42px;
   box-sizing: border-box;
 }
 
@@ -831,22 +843,22 @@ body {
 .du-purpose-left {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   min-width: 0;
   flex: 1;
   padding-right: 0.2rem;
 }
 
 .du-purpose-icon-bg {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   background: #ffffff;
   color: var(--du-emerald-700);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.775rem;
+  font-size: 0.725rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   flex-shrink: 0;
 }
@@ -857,12 +869,12 @@ body {
 }
 
 .du-purpose-text {
-  font-size: 0.8rem;
+  font-size: 0.775rem;
   font-weight: 700;
   color: var(--du-slate-800);
   white-space: normal;
   word-break: break-word;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .du-purpose-item.active .du-purpose-text {
@@ -870,14 +882,14 @@ body {
 }
 
 .du-check-dot {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   border: 1.5px solid var(--du-slate-400);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   color: transparent;
   transition: all 0.15s ease;
   flex-shrink: 0;
@@ -892,9 +904,9 @@ body {
 /* Submit Button */
 .du-btn-primary {
   width: 100%;
-  padding: 0.75rem 1.25rem;
+  padding: 0.65rem 1.1rem;
   font-family: var(--du-font-sans);
-  font-size: 1rem;
+  font-size: 0.925rem;
   font-weight: 800;
   color: #ffffff;
   background: linear-gradient(135deg, var(--du-emerald-700) 0%, var(--du-emerald-900) 100%);
@@ -906,9 +918,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
   letter-spacing: 0.01em;
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
 }
 
 .du-btn-primary:hover {
@@ -923,7 +935,7 @@ body {
 
 /* Embedded Quote Widget inside Form Card (Bottom Anchored) */
 .du-card-quote {
-  margin-top: 0.75rem;
+  margin-top: 0.6rem;
   padding-top: 0;
 }
 
@@ -931,16 +943,16 @@ body {
   background: var(--du-emerald-50);
   border: 1.5px dashed rgba(4, 120, 87, 0.25);
   border-radius: var(--du-radius-md);
-  padding: 0.65rem 0.85rem;
+  padding: 0.55rem 0.75rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.6rem;
+  gap: 0.5rem;
   box-sizing: border-box;
 }
 
 .du-card-quote-icon {
   color: var(--du-gold-600);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   margin-top: 0.1rem;
   flex-shrink: 0;
 }
@@ -951,10 +963,10 @@ body {
 }
 
 .du-card-quote-text {
-  font-size: 0.775rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--du-slate-800);
-  line-height: 1.35;
+  line-height: 1.3;
   margin: 0;
   white-space: normal;
   word-break: break-word;
@@ -962,10 +974,10 @@ body {
 
 .du-card-quote-author {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.675rem;
   font-weight: 800;
   color: var(--du-emerald-800);
-  margin-top: 0.2rem;
+  margin-top: 0.15rem;
 }
 
 /* Horizontal Avatar Display on LEFT */
@@ -976,11 +988,11 @@ body {
 }
 
 .du-large-avatar-img {
-  width: 95px;
-  height: 95px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3.5px solid #ffffff;
+  border: 3px solid #ffffff;
   box-shadow: 0 6px 18px rgba(6, 78, 59, 0.2);
   background: #ffffff;
   transition: transform 0.25s ease;
@@ -990,8 +1002,8 @@ body {
   position: absolute;
   bottom: 2px;
   right: 2px;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--du-emerald-600);
   border: 2px solid #ffffff;
@@ -999,36 +1011,36 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 .du-greeting-msg {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--du-emerald-950);
-  margin: 0 0 0.2rem 0;
-  line-height: 1.3;
+  margin: 0 0 0.15rem 0;
+  line-height: 1.25;
 }
 
 .du-greeting-purpose {
-  font-size: 0.85em;
+  font-size: 0.8em;
   font-weight: 700;
   color: var(--du-emerald-700);
   background: var(--du-emerald-100);
-  padding: 0.15rem 0.65rem;
+  padding: 0.12rem 0.55rem;
   border-radius: 20px;
   display: inline-block;
-  margin-left: 0.35rem;
+  margin-left: 0.3rem;
 }
 
 .du-greeting-sub {
-  font-size: 0.825rem;
+  font-size: 0.775rem;
   color: var(--du-slate-600);
   margin: 0;
 }
 
-/* Enlarged & Rich Latest Visitors Section */
+/* Recent Visitors Section - Zero Scroll Fit */
 .du-recent-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
@@ -1036,17 +1048,19 @@ body {
   border-radius: var(--du-radius-xl);
   border: 1.5px solid rgba(6, 95, 70, 0.12);
   box-shadow: var(--du-shadow-card);
-  padding: 1.35rem 1.6rem;
+  padding: 0.85rem 1.15rem;
   display: flex;
   flex-direction: column;
   height: 100%;
   box-sizing: border-box;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 @media (min-width: 1400px) {
   .du-recent-section {
-    padding: 1.6rem 2rem;
+    padding: 1rem 1.35rem;
   }
 }
 
@@ -1054,48 +1068,51 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
-  padding-bottom: 0.65rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
   border-bottom: 1.5px solid var(--du-slate-200);
   flex-shrink: 0;
 }
 
 .du-recent-title {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--du-emerald-950);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
 }
 
 @media (min-width: 1400px) {
   .du-recent-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 }
 
 .du-recent-badge {
-  font-size: 0.775rem;
+  font-size: 0.725rem;
   font-weight: 700;
   color: var(--du-emerald-700);
   background: var(--du-emerald-100);
-  padding: 0.2rem 0.7rem;
+  padding: 0.15rem 0.55rem;
   border-radius: 12px;
 }
 
-/* Visitor Cards Grid - Enlarged & Rich */
+/* Visitor Cards Grid - Compact Fit */
 .du-visitor-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
+  gap: 0.55rem;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  align-content: start;
 }
 
 @media (min-width: 1400px) {
   .du-visitor-grid {
-    gap: 0.95rem;
+    gap: 0.7rem;
   }
 }
 
@@ -1108,8 +1125,8 @@ body {
 .du-visitor-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.7rem 0.9rem;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
   background: rgba(248, 250, 252, 0.95);
   border-radius: var(--du-radius-lg);
   border: 1.5px solid var(--du-slate-200);
@@ -1121,8 +1138,8 @@ body {
 
 @media (min-width: 1400px) {
   .du-visitor-item {
-    padding: 0.85rem 1.1rem;
-    gap: 0.95rem;
+    padding: 0.6rem 0.85rem;
+    gap: 0.75rem;
   }
 }
 
@@ -1134,8 +1151,8 @@ body {
 }
 
 .du-v-avatar {
-  width: 46px;
-  height: 46px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--du-emerald-600);
@@ -1145,9 +1162,9 @@ body {
 
 @media (min-width: 1400px) {
   .du-v-avatar {
-    width: 52px;
-    height: 52px;
-    border-width: 2.5px;
+    width: 44px;
+    height: 44px;
+    border-width: 2px;
   }
 }
 
@@ -1158,35 +1175,35 @@ body {
 }
 
 .du-v-name {
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   font-weight: 700;
   color: var(--du-slate-900);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 @media (min-width: 1400px) {
   .du-v-name {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 }
 
 .du-v-meta {
-  font-size: 0.775rem;
+  font-size: 0.725rem;
   color: var(--du-slate-600);
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.15rem;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
   min-width: 0;
 }
 
 @media (min-width: 1400px) {
   .du-v-meta {
-    font-size: 0.85rem;
+    font-size: 0.775rem;
   }
 }
 
