@@ -769,7 +769,7 @@ body {
 }
 
 .du-label {
-  display: block;
+  display block;
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--du-emerald-900);
@@ -1025,28 +1025,35 @@ body {
   transform: translateY(0);
 }
 
-/* Embedded Quote Widget inside Form Card (Bottom Anchored) */
+/* Embedded Quote Widget inside Form Card (Bottom Anchored) - Prominent Typography */
 .du-card-quote {
-  margin-top: 0.5rem;
+  margin-top: 0.55rem;
   padding-top: 0;
 }
 
 .du-card-quote-box {
-  background: var(--du-emerald-50);
-  border: 1.5px dashed rgba(4, 120, 87, 0.25);
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+  border: 1.5px dashed rgba(4, 120, 87, 0.35);
   border-radius: var(--du-radius-md);
-  padding: 0.45rem 0.65rem;
+  padding: 0.6rem 0.85rem;
   display: flex;
   align-items: flex-start;
-  gap: 0.45rem;
+  gap: 0.6rem;
   box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.05);
 }
 
 .du-card-quote-icon {
   color: var(--du-gold-600);
-  font-size: 0.75rem;
-  margin-top: 0.1rem;
+  font-size: 0.95rem;
+  margin-top: 0.15rem;
   flex-shrink: 0;
+}
+
+@media (min-width: 1400px) {
+  .du-card-quote-icon {
+    font-size: 1.1rem;
+  }
 }
 
 .du-card-quote-content {
@@ -1055,21 +1062,35 @@ body {
 }
 
 .du-card-quote-text {
-  font-size: 0.725rem;
-  font-weight: 600;
-  color: var(--du-slate-800);
-  line-height: 1.25;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--du-emerald-950);
+  line-height: 1.35;
   margin: 0;
   white-space: normal;
   word-break: break-word;
 }
 
+@media (min-width: 1400px) {
+  .du-card-quote-text {
+    font-size: 1rem;
+  }
+}
+
 .du-card-quote-author {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.775rem;
   font-weight: 800;
   color: var(--du-emerald-800);
-  margin-top: 0.1rem;
+  margin-top: 0.2rem;
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 1400px) {
+  .du-card-quote-author {
+    font-size: 0.825rem;
+  }
 }
 
 /* Horizontal Avatar Display on LEFT */
