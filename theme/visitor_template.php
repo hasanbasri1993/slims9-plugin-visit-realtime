@@ -202,12 +202,6 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                 <span><?= $sysconf['library_name']; ?> — {{ isShowMode ? 'Display Informasi Presensi' : 'Anjungan Presensi Presisi' }}</span>
             </div>
 
-            <!-- Digital Signage Live Status Pulse Badge -->
-            <div v-if="isShowMode" class="du-signage-live-badge">
-                <span class="du-pulse-dot"></span>
-                <span>LIVE DIGITAL SIGNAGE BOARD</span>
-            </div>
-
             <!-- Live Digital Clock Widget -->
             <div class="du-clock-widget">
                 <i class="far fa-clock text-amber-400"></i>
