@@ -20,7 +20,7 @@
 * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 *
 */
-use SLiMS\{Visitor,Json};
+use SLiMS\{Visitor,Json,DB};
 
 // be sure that this file not accessed directly
 if (!defined('INDEX_AUTH')) {
@@ -30,6 +30,9 @@ if (!defined('INDEX_AUTH')) {
 }
 
 $env = loadVisitPluginEnv();
+
+// Check if Display / Information Screen Mode (&show=true) is requested
+$isShowMode = isset($_GET['show']) && ($_GET['show'] === 'true' || $_GET['show'] === '1');
 
 // Create visitor instance
 $opac = $opac ?? null;
@@ -49,7 +52,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'search_member') {
     
     $kwPattern = '%' . $keywords . '%';
     try {
-        $stmt = \SLiMS\DB::getInstance()->prepare("
+        $stmt = DB::getInstance()->prepare("
             SELECT member_id, member_name, inst_name, COALESCE(member_notes, '') AS member_notes, COALESCE(member_image, 'photo.png') AS member_image
             FROM member
             WHERE (is_pending = 0 OR is_pending IS NULL)
@@ -186,7 +189,6 @@ require __DIR__ . '/theme/visitor_template.php';
 // main content
 $main_content = ob_get_clean();
 // page title
-$page_title = __('Visitor Counter').' | ' . $sysconf['library_name'];
+$page_title = ($isShowMode ? __('Display Informasi Presensi') : __('Visitor Counter')) . ' | ' . $sysconf['library_name'];
 require $main_template_path;
 exit();
-

@@ -38,6 +38,9 @@ if (isset($_GET['select_lang'])) {
     $sysconf['default_lang'] = trim(strip_tags($_COOKIE['select_lang']));
 }
 
+// Check Display / Show Mode variable
+$isShowMode = $isShowMode ?? (isset($_GET['show']) && ($_GET['show'] === 'true' || $_GET['show'] === '1'));
+
 $data = [];
 $activeSchema = DB::getInstance()->query('select * from mst_visitor_room');
 if ($activeSchema->rowCount()) {
@@ -64,17 +67,20 @@ try {
     $latestVisitors = [];
 }
 
-// Fetch total visitors count for today
+// Fetch total visitors count for today, week, and month
 $todayVisitorCount = 0;
+$weekVisitorCount = 0;
+$monthVisitorCount = 0;
+
 try {
-    $todayStmt = DB::getInstance()->query("
-        SELECT COUNT(*) 
-        FROM visitor_count 
-        WHERE DATE(checkin_date) = CURRENT_DATE()
-    ");
-    if ($todayStmt) {
-        $todayVisitorCount = (int)$todayStmt->fetchColumn();
-    }
+    $todayStmt = DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE DATE(checkin_date) = CURRENT_DATE()");
+    if ($todayStmt) $todayVisitorCount = (int)$todayStmt->fetchColumn();
+
+    $weekStmt = DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE YEARWEEK(checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)");
+    if ($weekStmt) $weekVisitorCount = (int)$weekStmt->fetchColumn();
+
+    $monthStmt = DB::getInstance()->query("SELECT COUNT(*) FROM visitor_count WHERE YEAR(checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(checkin_date) = MONTH(CURRENT_DATE())");
+    if ($monthStmt) $monthVisitorCount = (int)$monthStmt->fetchColumn();
 } catch (\Throwable $e) {
     $todayVisitorCount = count($latestVisitors);
 }
@@ -101,13 +107,52 @@ try {
     $topRoomName = 'Perpustakaan';
 }
 
+// Fetch Top Visitors Leaderboard (Week & Month) for Display Mode (&show=true)
+$topVisitorsWeek = [];
+$topVisitorsMonth = [];
+try {
+    $topWStmt = DB::getInstance()->query("
+        SELECT vc.member_id, vc.member_name, COUNT(*) AS total_visits,
+               COALESCE(m.inst_name, '') AS inst_name,
+               COALESCE(m.member_image, 'photo.png') AS member_image,
+               COALESCE(m.member_notes, '') AS member_notes
+        FROM visitor_count AS vc
+        LEFT JOIN member AS m ON vc.member_id = m.member_id
+        WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
+        GROUP BY vc.member_id, vc.member_name
+        ORDER BY total_visits DESC
+        LIMIT 5
+    ");
+    if ($topWStmt) $topVisitorsWeek = $topWStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+    $topMStmt = DB::getInstance()->query("
+        SELECT vc.member_id, vc.member_name, COUNT(*) AS total_visits,
+               COALESCE(m.inst_name, '') AS inst_name,
+               COALESCE(m.member_image, 'photo.png') AS member_image,
+               COALESCE(m.member_notes, '') AS member_notes
+        FROM visitor_count AS vc
+        LEFT JOIN member AS m ON vc.member_id = m.member_id
+        WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
+        GROUP BY vc.member_id, vc.member_name
+        ORDER BY total_visits DESC
+        LIMIT 5
+    ");
+    if ($topMStmt) $topVisitorsMonth = $topMStmt->fetchAll(\PDO::FETCH_ASSOC);
+} catch (\Throwable $e) {
+    $topVisitorsWeek = [];
+    $topVisitorsMonth = [];
+}
+
+// Read Announcement text from config.env
+$announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan Pesantren Modern Daarul 'Uluum Lido Bogor — Mari Tingkatkan Minat Baca dan Budaya Literasi Santri!";
+
 ?>
 
 <div class="vegas-slide"></div>
 
 <div class="du-container" id="visitor_counter">
     <!-- Audio / TTS Initialization Modal -->
-    <div v-if="!ttsInitialized" class="du-modal-overlay">
+    <div v-if="!ttsInitialized && !isShowMode" class="du-modal-overlay">
         <div class="du-modal-content">
             <img src="<?php echo assets('images/logo.png'); ?>" alt="Logo Daarul 'Uluum Lido" class="du-modal-logo">
             <h3 class="du-modal-title"><?= $sysconf['library_name']; ?></h3>
@@ -129,7 +174,7 @@ try {
             <h1 class="du-institution-name">PESANTREN MODERN DAARUL 'ULUUM LIDO BOGOR</h1>
             <div class="du-kiosk-tagline">
                 <i class="fas fa-book-reader"></i>
-                <span><?= $sysconf['library_name']; ?> — Anjungan Presensi Presisi</span>
+                <span><?= $sysconf['library_name']; ?> — {{ isShowMode ? 'Display Informasi Presensi' : 'Anjungan Presensi Presisi' }}</span>
             </div>
 
             <!-- Live Digital Clock Widget -->
@@ -158,12 +203,23 @@ try {
         </div>
     </header>
 
+    <!-- Running Announcement Ticker Bar (When in Display Mode &show=true) -->
+    <div v-if="isShowMode" class="du-announcement-ticker">
+        <div class="du-announcement-badge">
+            <i class="fas fa-bullhorn text-amber-400"></i>
+            <span>Pengumuman</span>
+        </div>
+        <div class="du-announcement-marquee">
+            <marquee behavior="scroll" direction="left" scrollamount="6">{{ announcementText }}</marquee>
+        </div>
+    </div>
+
     <!-- Main Grid Layout -->
     <div class="du-grid">
-        <!-- Left Side Column: Kiosk Stats Bar + Form Card -->
+        <!-- Left Side Column -->
         <div class="du-left-col">
-            <!-- Summary Kiosk Stats Bar (Left Column Above Form Card) -->
-            <div class="du-stats-bar">
+            <!-- Normal Mode: Summary Kiosk Stats Bar -->
+            <div v-if="!isShowMode" class="du-stats-bar">
                 <div class="du-stat-card">
                     <div class="du-stat-icon">
                         <i class="fas fa-user-check"></i>
@@ -193,8 +249,8 @@ try {
                 </div>
             </div>
 
-            <!-- Form Kiosk Card with Quote Embedded at Bottom -->
-            <div class="du-card">
+            <!-- Normal Mode: Form Kiosk Card -->
+            <div v-if="!isShowMode" class="du-card">
                 <div>
                     <h3 class="du-card-title">
                         <i class="fas fa-user-check text-emerald-600"></i>
@@ -277,10 +333,96 @@ try {
                     </div>
                 </div>
             </div>
+
+            <!-- Display Mode (&show=true): Comprehensive Visitor Analytics Card -->
+            <div v-if="isShowMode" class="du-card">
+                <div>
+                    <h3 class="du-card-title">
+                        <i class="fas fa-chart-line text-emerald-600"></i>
+                        <span>Statistik Kunjungan</span>
+                    </h3>
+                    <p class="du-card-subtitle">Ringkasan total kehadiran santri dan pemustaka perpustakaan.</p>
+
+                    <!-- Big 3-Stat Counter Grid -->
+                    <div class="du-display-stats-grid">
+                        <div class="du-display-stat-card">
+                            <div class="du-display-stat-num">{{ todayVisitorCount }}</div>
+                            <div class="du-display-stat-label">Hari Ini</div>
+                        </div>
+                        <div class="du-display-stat-card">
+                            <div class="du-display-stat-num">{{ weekVisitorCount }}</div>
+                            <div class="du-display-stat-label">Minggu Ini</div>
+                        </div>
+                        <div class="du-display-stat-card">
+                            <div class="du-display-stat-num">{{ monthVisitorCount }}</div>
+                            <div class="du-display-stat-label">Bulan Ini</div>
+                        </div>
+                    </div>
+
+                    <!-- Operational Hours Banner -->
+                    <div class="du-purpose-item active" style="margin-bottom: 0.75rem;">
+                        <div class="du-purpose-left">
+                            <div class="du-purpose-icon-bg">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <div class="du-purpose-text">Jam Operasional Layanan</div>
+                                <div style="font-size: 0.75rem; color: var(--du-emerald-700); font-weight: 700;">07:10 - 21:45 WIB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Embedded Quote Widget at bottom -->
+                <div v-if="quotes && quotes.content" class="du-card-quote">
+                    <div class="du-card-quote-box">
+                        <i class="fas fa-quote-left du-card-quote-icon"></i>
+                        <div class="du-card-quote-content">
+                            <p class="du-card-quote-text">{{ quotes.content }}</p>
+                            <span class="du-card-quote-author">— {{ quotes.author }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Right Side Column: Full Height Enlarged Recent Visitors Feed -->
+        <!-- Right Side Column -->
         <div class="du-right-col">
+            <!-- Display Mode (&show=true): Top Visitors Hall of Fame / Leaderboard Card -->
+            <div v-if="isShowMode" class="du-leaderboard-card">
+                <div class="du-leaderboard-header">
+                    <h4 class="du-leaderboard-title">
+                        <i class="fas fa-trophy text-amber-500"></i>
+                        <span>Top Pengunjung Terajin</span>
+                    </h4>
+                    <div class="du-leaderboard-tabs">
+                        <button type="button" class="du-tab-btn" :class="{ active: topVisitorPeriod === 'month' }" @click="topVisitorPeriod = 'month'">Bulan Ini</button>
+                        <button type="button" class="du-tab-btn" :class="{ active: topVisitorPeriod === 'week' }" @click="topVisitorPeriod = 'week'">Minggu Ini</button>
+                    </div>
+                </div>
+
+                <div v-if="activeTopVisitors.length > 0" class="du-leaderboard-list">
+                    <div v-for="(v, idx) in activeTopVisitors" :key="v.member_id" class="du-leader-item">
+                        <div class="du-rank-badge" :class="'du-rank-' + (idx + 1 > 3 ? 'other' : (idx + 1))">
+                            {{ idx + 1 }}
+                        </div>
+                        <img :src="getVisitorImage(v.member_image)" alt="Avatar" class="du-leader-avatar" @error="onGridImageError($event)">
+                        <div class="du-leader-info">
+                            <h5 class="du-leader-name">{{ v.member_name }}</h5>
+                            <div class="du-leader-meta">
+                                <span v-if="v.member_notes" class="du-ac-note" style="margin-top:0;"><i class="fas fa-info-circle"></i> {{ v.member_notes }}</span>
+                                <span v-else-if="v.inst_name">{{ v.inst_name }}</span>
+                            </div>
+                        </div>
+                        <div class="du-leader-count-badge">{{ v.total_visits }}x Kunjungan</div>
+                    </div>
+                </div>
+                <div v-else class="text-center py-4 text-slate-500 text-sm">
+                    Belum ada data pemeringkatan pengunjung.
+                </div>
+            </div>
+
+            <!-- Recent Visitors Live Feed -->
             <div class="du-recent-section">
                 <div class="du-recent-header">
                     <h4 class="du-recent-title">
@@ -337,14 +479,26 @@ try {
                 timeout: null,
                 ttsEnabled: false,
                 ttsInitialized: false,
+                isShowMode: <?php echo json_encode((bool)$isShowMode); ?>,
                 recentVisitors: <?php echo json_encode($latestVisitors); ?>,
                 todayVisitorCount: <?php echo $todayVisitorCount; ?>,
+                weekVisitorCount: <?php echo $weekVisitorCount; ?>,
+                monthVisitorCount: <?php echo $monthVisitorCount; ?>,
+                topVisitorsWeek: <?php echo json_encode($topVisitorsWeek); ?>,
+                topVisitorsMonth: <?php echo json_encode($topVisitorsMonth); ?>,
+                topVisitorPeriod: 'month',
+                announcementText: <?php echo json_encode($announcementText); ?>,
                 currentTime: '',
                 currentDate: '',
                 searchResults: [],
                 showAutocomplete: false,
                 selectedSearchIndex: -1,
                 searchDebounce: null
+            }
+        },
+        computed: {
+            activeTopVisitors: function() {
+                return this.topVisitorPeriod === 'week' ? this.topVisitorsWeek : this.topVisitorsMonth;
             }
         },
         mounted() {
@@ -370,6 +524,8 @@ try {
                     self.visitPurposeText = data.visit_purpose_text || '';
                     self.image = `./images/persons/${data.member_image || 'photo.png'}`;
                     self.todayVisitorCount++;
+                    self.weekVisitorCount++;
+                    self.monthVisitorCount++;
 
                     self.addRecentVisitor({
                         visitor_id: Date.now(),
@@ -529,6 +685,8 @@ try {
                     .then(res => {
                         this.textInfo = res.data.message || ''
                         this.todayVisitorCount++;
+                        this.weekVisitorCount++;
+                        this.monthVisitorCount++;
                         
                         // Extract real member name from response or greeting string
                         let realName = res.data.member_name || res.data.memberName;

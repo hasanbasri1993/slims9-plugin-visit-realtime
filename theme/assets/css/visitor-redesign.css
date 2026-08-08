@@ -247,6 +247,43 @@ body {
   color: var(--du-gold-400);
 }
 
+/* Announcement Ticker Bar */
+.du-announcement-ticker {
+  background: rgba(6, 78, 59, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(234, 179, 8, 0.45);
+  border-radius: var(--du-radius-lg);
+  padding: 0.4rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.du-announcement-badge {
+  background: rgba(2, 44, 34, 0.8);
+  color: var(--du-gold-400);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.du-announcement-marquee {
+  flex: 1;
+  min-width: 0;
+  color: #ffffff;
+  font-size: 0.825rem;
+  font-weight: 600;
+}
+
 /* Main Grid Layout */
 .du-grid {
   display: grid;
@@ -289,10 +326,11 @@ body {
 .du-right-col {
   display: flex;
   flex-direction: column;
+  gap: 0.85rem;
   height: 100%;
 }
 
-/* Summary Kiosk Stats Counter Bar (Padded & Spaced) */
+/* Summary Kiosk Stats Counter Bar */
 .du-stats-bar {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -371,6 +409,171 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Display Mode Big Stats Grid (3 Columns) */
+.du-display-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.du-display-stat-card {
+  background: linear-gradient(135deg, var(--du-emerald-900) 0%, var(--du-emerald-950) 100%);
+  border: 1.5px solid rgba(234, 179, 8, 0.35);
+  border-radius: var(--du-radius-lg);
+  padding: 0.75rem 0.65rem;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 44, 34, 0.2);
+}
+
+.du-display-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--du-gold-400);
+  line-height: 1.1;
+}
+
+.du-display-stat-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--du-emerald-100);
+  margin-top: 0.2rem;
+}
+
+/* Leaderboard Hall of Fame */
+.du-leaderboard-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--du-radius-xl);
+  border: 1.5px solid rgba(6, 95, 70, 0.12);
+  box-shadow: var(--du-shadow-card);
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.du-leaderboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1.5px solid var(--du-slate-200);
+}
+
+.du-leaderboard-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.du-leaderboard-tabs {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.du-tab-btn {
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 20px;
+  border: 1px solid var(--du-slate-200);
+  background: var(--du-slate-100);
+  color: var(--du-slate-600);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.du-tab-btn.active {
+  background: var(--du-emerald-700);
+  color: #ffffff;
+  border-color: var(--du-emerald-700);
+}
+
+.du-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.du-leader-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--du-slate-50);
+  border: 1.5px solid var(--du-slate-200);
+  border-radius: var(--du-radius-lg);
+  transition: all 0.15s ease;
+}
+
+.du-leader-item:hover {
+  background: #ffffff;
+  border-color: var(--du-emerald-500);
+}
+
+.du-rank-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.du-rank-1 { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 2px 6px rgba(217, 119, 6, 0.4); }
+.du-rank-2 { background: linear-gradient(135deg, #94a3b8, #64748b); }
+.du-rank-3 { background: linear-gradient(135deg, #d97706, #b45309); }
+.du-rank-other { background: var(--du-emerald-700); }
+
+.du-leader-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--du-emerald-600);
+  flex-shrink: 0;
+}
+
+.du-leader-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.du-leader-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--du-slate-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.du-leader-meta {
+  font-size: 0.7rem;
+  color: var(--du-slate-600);
+}
+
+.du-leader-count-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--du-emerald-800);
+  background: var(--du-emerald-100);
+  padding: 0.15rem 0.55rem;
+  border-radius: 12px;
+  white-space: nowrap;
 }
 
 /* Kiosk Form Card */
@@ -783,7 +986,7 @@ body {
   margin: 0;
 }
 
-/* Enlarged & Rich Latest Visitors Section (Full Height Right Column) */
+/* Enlarged & Rich Latest Visitors Section */
 .du-recent-section {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
@@ -796,6 +999,7 @@ body {
   flex-direction: column;
   height: 100%;
   box-sizing: border-box;
+  flex: 1;
 }
 
 @media (min-width: 1400px) {
