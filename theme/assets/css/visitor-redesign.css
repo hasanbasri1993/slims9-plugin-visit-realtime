@@ -1,0 +1,998 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Cinzel:wght@500;700;800&display=swap');
+
+:root {
+  --du-emerald-950: #022c22;
+  --du-emerald-900: #064e3b;
+  --du-emerald-800: #065f46;
+  --du-emerald-700: #047857;
+  --du-emerald-600: #059669;
+  --du-emerald-500: #10b981;
+  --du-emerald-100: #d1fae5;
+  --du-emerald-50:  #ecfdf5;
+
+  --du-gold-600: #d97706;
+  --du-gold-500: #eab308;
+  --du-gold-400: #facc15;
+  --du-gold-100: #fef9c3;
+  --du-gold-50:  #fffbeb;
+
+  --du-slate-900: #0f172a;
+  --du-slate-800: #1e293b;
+  --du-slate-600: #475569;
+  --du-slate-400: #94a3b8;
+  --du-slate-200: #e2e8f0;
+  --du-slate-100: #f8fafc;
+
+  --du-font-sans: 'Plus Jakarta Sans', sans-serif;
+  --du-font-serif: 'Cinzel', Georgia, serif;
+
+  --du-radius-xl: 16px;
+  --du-radius-lg: 12px;
+  --du-radius-md: 10px;
+
+  --du-shadow-card: 0 10px 30px -5px rgba(2, 44, 34, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+  --du-shadow-glow: 0 10px 28px -4px rgba(4, 120, 87, 0.35);
+}
+
+/* Background Vegas Slideshow Canvas strictly behind everything */
+.vegas-slide, .vegas-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: -9999 !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.vegas-wrapper, .vegas-overlay, .vegas-slide-inner {
+  z-index: -9999 !important;
+  pointer-events: none !important;
+}
+
+html, body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--du-font-sans);
+  background-color: rgba(240, 253, 244, 0.72) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: var(--du-slate-900);
+  position: relative;
+  z-index: 1;
+  padding-bottom: 2rem;
+}
+
+/* Kiosk Layout Container */
+.du-container {
+  width: 100%;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 1rem 1.35rem;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 10;
+  min-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media (min-width: 1680px) {
+  .du-container {
+    max-width: 1680px;
+    padding: 1.35rem 2rem;
+  }
+}
+
+/* Header Row & Live Digital Clock */
+.du-header {
+  text-align: center;
+  margin-bottom: 0.85rem;
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.du-header-idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: du-fade-in 0.3s ease-out;
+  background: transparent;
+  width: 100%;
+}
+
+/* Live Digital Clock Badge */
+.du-clock-widget {
+  background: rgba(6, 78, 59, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  border-radius: 30px;
+  padding: 0.35rem 1.1rem;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.du-clock-time {
+  font-family: var(--du-font-sans);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--du-gold-400);
+  letter-spacing: 0.04em;
+}
+
+.du-clock-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f8fafc;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  padding-left: 0.65rem;
+}
+
+/* Horizontal Active Greeting Banner */
+.du-header-active {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.35rem;
+  text-align: left;
+  animation: du-pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid var(--du-emerald-500);
+  padding: 0.85rem 1.5rem;
+  box-shadow: 0 12px 30px rgba(4, 120, 87, 0.2);
+  max-width: 920px;
+  margin: 0 auto;
+  border-radius: var(--du-radius-xl);
+  box-sizing: border-box;
+}
+
+.du-header-active-info {
+  flex: 1;
+  min-width: 0;
+}
+
+@keyframes du-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes du-pop-in {
+  from { opacity: 0; transform: scale(0.92) translateY(-10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.du-logo-wrapper {
+  position: relative;
+  margin-bottom: 0.3rem;
+}
+
+.du-logo-img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.32));
+  transition: transform 0.25s ease;
+}
+
+@media (min-width: 1400px) {
+  .du-logo-img {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+.du-logo-img:hover {
+  transform: scale(1.03);
+}
+
+/* Institutional Title with Text Outline / Outfill */
+.du-institution-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.2rem 0;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1.3px #022c22;
+  text-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(2, 44, 34, 0.8),
+    -1px -1px 0 #022c22,
+     1px -1px 0 #022c22,
+    -1px  1px 0 #022c22,
+     1px  1px 0 #022c22;
+}
+
+@media (min-width: 1400px) {
+  .du-institution-name {
+    font-size: 1.65rem;
+    -webkit-text-stroke: 1.6px #022c22;
+  }
+}
+
+.du-kiosk-tagline {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(6, 78, 59, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  padding: 0.2rem 0.85rem;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.du-kiosk-tagline i {
+  color: var(--du-gold-400);
+}
+
+/* Main Grid Layout */
+.du-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+  flex: 1;
+  align-items: stretch;
+}
+
+@media (min-width: 992px) {
+  .du-grid {
+    grid-template-columns: 490px 1fr;
+    gap: 1.35rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .du-grid {
+    grid-template-columns: 550px 1fr;
+    gap: 1.75rem;
+  }
+}
+
+@media (min-width: 1680px) {
+  .du-grid {
+    grid-template-columns: 600px 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Left Column wrapper */
+.du-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  height: 100%;
+}
+
+/* Right Column wrapper */
+.du-right-col {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Summary Kiosk Stats Counter Bar (Padded & Spaced) */
+.du-stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.du-stat-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--du-radius-lg);
+  border: 1.5px solid rgba(6, 95, 70, 0.12);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 3px 10px rgba(2, 44, 34, 0.04);
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.du-stat-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--du-emerald-100);
+  color: var(--du-emerald-800);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.du-stat-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.du-stat-val {
+  font-size: 0.925rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  line-height: 1.15;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.du-stat-time {
+  font-size: 0.825rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.du-stat-val-sm {
+  font-size: 0.775rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.du-stat-lbl {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--du-slate-600);
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Kiosk Form Card */
+.du-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--du-radius-xl);
+  border: 1.5px solid rgba(6, 95, 70, 0.12);
+  box-shadow: var(--du-shadow-card);
+  padding: 1.25rem 1.45rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: visible;
+  flex: 1;
+}
+
+@media (min-width: 1400px) {
+  .du-card {
+    padding: 1.5rem 1.75rem;
+  }
+}
+
+.du-card-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.du-card-subtitle {
+  font-size: 0.8rem;
+  color: var(--du-slate-600);
+  margin: 0 0 0.85rem 0;
+  line-height: 1.35;
+}
+
+/* Form Controls */
+.du-form-group {
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+
+.du-label {
+  display: block;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--du-emerald-900);
+  margin-bottom: 0.35rem;
+}
+
+.du-input-group {
+  position: relative;
+}
+
+.du-input-icon {
+  position: absolute;
+  left: 0.95rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--du-emerald-700);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.du-input {
+  width: 100%;
+  padding: 0.7rem 0.85rem 0.7rem 2.6rem;
+  font-family: var(--du-font-sans);
+  font-size: 0.925rem;
+  font-weight: 600;
+  color: var(--du-slate-900);
+  background: var(--du-slate-100);
+  border: 2px solid var(--du-slate-200);
+  border-radius: var(--du-radius-lg);
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.du-input:focus {
+  background: #ffffff;
+  border-color: var(--du-emerald-600);
+  box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.12);
+}
+
+/* Autocomplete Floating Dropdown */
+.du-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 250;
+  background: #ffffff;
+  border-radius: var(--du-radius-lg);
+  border: 1.5px solid var(--du-emerald-500);
+  box-shadow: 0 12px 28px rgba(2, 44, 34, 0.2);
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0.3rem 0;
+}
+
+.du-autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid var(--du-slate-100);
+}
+
+.du-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.du-autocomplete-item:hover,
+.du-autocomplete-item.active {
+  background: var(--du-emerald-50);
+}
+
+.du-ac-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--du-emerald-600);
+  flex-shrink: 0;
+}
+
+.du-ac-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.du-ac-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--du-slate-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.du-ac-meta {
+  font-size: 0.725rem;
+  color: var(--du-slate-600);
+}
+
+.du-ac-note {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--du-gold-600);
+  background: var(--du-gold-50);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  margin-top: 0.15rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.du-ac-arrow {
+  font-size: 0.8rem;
+  color: var(--du-slate-400);
+  margin-left: auto;
+}
+
+/* Purpose Selection Grid */
+.du-purpose-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.55rem;
+  box-sizing: border-box;
+}
+
+.du-purpose-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.7rem;
+  background: var(--du-slate-100);
+  border: 1.5px solid var(--du-slate-200);
+  border-radius: var(--du-radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+.du-purpose-item:hover {
+  border-color: var(--du-emerald-500);
+  background: #ffffff;
+}
+
+.du-purpose-item.active {
+  background: var(--du-emerald-50);
+  border-color: var(--du-emerald-600);
+  box-shadow: 0 2px 8px rgba(4, 120, 87, 0.1);
+}
+
+.du-purpose-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  flex: 1;
+  padding-right: 0.2rem;
+}
+
+.du-purpose-icon-bg {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--du-emerald-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.775rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+
+.du-purpose-item.active .du-purpose-icon-bg {
+  background: var(--du-emerald-600);
+  color: #ffffff;
+}
+
+.du-purpose-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--du-slate-800);
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.25;
+}
+
+.du-purpose-item.active .du-purpose-text {
+  color: var(--du-emerald-950);
+}
+
+.du-check-dot {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1.5px solid var(--du-slate-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: transparent;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.du-purpose-item.active .du-check-dot {
+  background: var(--du-emerald-600);
+  border-color: var(--du-emerald-600);
+  color: #ffffff;
+}
+
+/* Submit Button */
+.du-btn-primary {
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  font-family: var(--du-font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--du-emerald-700) 0%, var(--du-emerald-900) 100%);
+  border: none;
+  border-radius: var(--du-radius-lg);
+  cursor: pointer;
+  box-shadow: var(--du-shadow-glow);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  letter-spacing: 0.01em;
+  margin-top: 0.75rem;
+}
+
+.du-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(4, 120, 87, 0.4);
+  background: linear-gradient(135deg, var(--du-emerald-600) 0%, var(--du-emerald-800) 100%);
+}
+
+.du-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Embedded Quote Widget inside Form Card (Bottom Anchored) */
+.du-card-quote {
+  margin-top: 0.75rem;
+  padding-top: 0;
+}
+
+.du-card-quote-box {
+  background: var(--du-emerald-50);
+  border: 1.5px dashed rgba(4, 120, 87, 0.25);
+  border-radius: var(--du-radius-md);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  box-sizing: border-box;
+}
+
+.du-card-quote-icon {
+  color: var(--du-gold-600);
+  font-size: 0.85rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.du-card-quote-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.du-card-quote-text {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--du-slate-800);
+  line-height: 1.35;
+  margin: 0;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.du-card-quote-author {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--du-emerald-800);
+  margin-top: 0.2rem;
+}
+
+/* Horizontal Avatar Display on LEFT */
+.du-large-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.du-large-avatar-img {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3.5px solid #ffffff;
+  box-shadow: 0 6px 18px rgba(6, 78, 59, 0.2);
+  background: #ffffff;
+  transition: transform 0.25s ease;
+}
+
+.du-avatar-status-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: var(--du-emerald-600);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.du-greeting-msg {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  margin: 0 0 0.2rem 0;
+  line-height: 1.3;
+}
+
+.du-greeting-purpose {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: var(--du-emerald-700);
+  background: var(--du-emerald-100);
+  padding: 0.15rem 0.65rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-left: 0.35rem;
+}
+
+.du-greeting-sub {
+  font-size: 0.825rem;
+  color: var(--du-slate-600);
+  margin: 0;
+}
+
+/* Enlarged & Rich Latest Visitors Section (Full Height Right Column) */
+.du-recent-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--du-radius-xl);
+  border: 1.5px solid rgba(6, 95, 70, 0.12);
+  box-shadow: var(--du-shadow-card);
+  padding: 1.35rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1400px) {
+  .du-recent-section {
+    padding: 1.6rem 2rem;
+  }
+}
+
+.du-recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1.5px solid var(--du-slate-200);
+  flex-shrink: 0;
+}
+
+.du-recent-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 1400px) {
+  .du-recent-title {
+    font-size: 1.3rem;
+  }
+}
+
+.du-recent-badge {
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: var(--du-emerald-700);
+  background: var(--du-emerald-100);
+  padding: 0.2rem 0.7rem;
+  border-radius: 12px;
+}
+
+/* Visitor Cards Grid - Enlarged & Rich */
+.du-visitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  flex: 1;
+}
+
+@media (min-width: 1400px) {
+  .du-visitor-grid {
+    gap: 0.95rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .du-visitor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.du-visitor-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(248, 250, 252, 0.95);
+  border-radius: var(--du-radius-lg);
+  border: 1.5px solid var(--du-slate-200);
+  transition: all 0.2s ease;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+@media (min-width: 1400px) {
+  .du-visitor-item {
+    padding: 0.85rem 1.1rem;
+    gap: 0.95rem;
+  }
+}
+
+.du-visitor-item:hover {
+  background: #ffffff;
+  border-color: var(--du-emerald-500);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(4, 120, 87, 0.12);
+}
+
+.du-v-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--du-emerald-600);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1400px) {
+  .du-v-avatar {
+    width: 52px;
+    height: 52px;
+    border-width: 2.5px;
+  }
+}
+
+.du-v-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.du-v-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--du-slate-900);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+
+@media (min-width: 1400px) {
+  .du-v-name {
+    font-size: 1rem;
+  }
+}
+
+.du-v-meta {
+  font-size: 0.775rem;
+  color: var(--du-slate-600);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  min-width: 0;
+}
+
+@media (min-width: 1400px) {
+  .du-v-meta {
+    font-size: 0.85rem;
+  }
+}
+
+.du-v-room {
+  color: var(--du-emerald-700);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Modal Overlay */
+.du-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(2, 44, 34, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.du-modal-content {
+  width: 100%;
+  max-width: 380px;
+  background: #ffffff;
+  border-radius: var(--du-radius-xl);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.du-modal-logo {
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 1rem auto;
+  object-fit: contain;
+}
+
+.du-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--du-emerald-950);
+  margin: 0 0 0.35rem 0;
+}
+
+.du-modal-desc {
+  font-size: 0.8rem;
+  color: var(--du-slate-600);
+  margin: 0 0 1.25rem 0;
+  line-height: 1.4;
+}
