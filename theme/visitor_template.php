@@ -107,7 +107,7 @@ try {
     $topRoomName = 'Perpustakaan';
 }
 
-// Fetch Top Visitors Leaderboard (Week & Month) for Display Mode (&show=true)
+// Fetch Top 3 Visitors Leaderboard (Week & Month) for Display Mode (&show=true)
 $topVisitorsWeek = [];
 $topVisitorsMonth = [];
 $purposeWeek = [];
@@ -124,7 +124,7 @@ try {
         WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
         GROUP BY vc.member_id, vc.member_name
         ORDER BY total_visits DESC
-        LIMIT 5
+        LIMIT 3
     ");
     if ($topWStmt) $topVisitorsWeek = $topWStmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -138,7 +138,7 @@ try {
         WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
         GROUP BY vc.member_id, vc.member_name
         ORDER BY total_visits DESC
-        LIMIT 5
+        LIMIT 3
     ");
     if ($topMStmt) $topVisitorsMonth = $topMStmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -443,12 +443,12 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
 
         <!-- Right Side Column -->
         <div class="du-right-col">
-            <!-- Display Mode (&show=true): Top Visitors Hall of Fame / Leaderboard Card -->
+            <!-- Display Mode (&show=true): Top 3 Visitors Hall of Fame / Leaderboard Card -->
             <div v-if="isShowMode" class="du-leaderboard-card">
                 <div class="du-leaderboard-header">
                     <h4 class="du-leaderboard-title">
                         <i class="fas fa-trophy text-amber-500"></i>
-                        <span>Top Pengunjung Terajin</span>
+                        <span>Top 3 Pengunjung Terajin</span>
                     </h4>
                     <div class="du-leaderboard-tabs">
                         <button type="button" class="du-tab-btn" :class="{ active: topVisitorPeriod === 'month' }" @click="topVisitorPeriod = 'month'">Bulan Ini</button>
@@ -458,7 +458,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
 
                 <div v-if="activeTopVisitors.length > 0" class="du-leaderboard-list">
                     <div v-for="(v, idx) in activeTopVisitors" :key="v.member_id" class="du-leader-item">
-                        <div class="du-rank-badge" :class="'du-rank-' + (idx + 1 > 3 ? 'other' : (idx + 1))">
+                        <div class="du-rank-badge" :class="'du-rank-' + (idx + 1)">
                             {{ idx + 1 }}
                         </div>
                         <img :src="getVisitorImage(v.member_image)" alt="Avatar" class="du-leader-avatar" @error="onGridImageError($event)">
@@ -555,7 +555,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
         },
         computed: {
             activeTopVisitors: function() {
-                return this.topVisitorPeriod === 'week' ? this.topVisitorsWeek : this.topVisitorsMonth;
+                return (this.topVisitorPeriod === 'week' ? this.topVisitorsWeek : this.topVisitorsMonth).slice(0, 3);
             },
             displayedRecentVisitors: function() {
                 if (this.isShowMode) {

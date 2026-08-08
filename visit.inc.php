@@ -87,7 +87,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_display_stats') {
             WHERE YEARWEEK(vc.checkin_date, 1) = YEARWEEK(CURRENT_DATE(), 1)
             GROUP BY vc.member_id, vc.member_name
             ORDER BY total_visits DESC
-            LIMIT 5
+            LIMIT 3
         ");
         $topWeek = $topWStmt ? $topWStmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
@@ -101,7 +101,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'get_display_stats') {
             WHERE YEAR(vc.checkin_date) = YEAR(CURRENT_DATE()) AND MONTH(vc.checkin_date) = MONTH(CURRENT_DATE())
             GROUP BY vc.member_id, vc.member_name
             ORDER BY total_visits DESC
-            LIMIT 5
+            LIMIT 3
         ");
         $topMonth = $topMStmt ? $topMStmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
