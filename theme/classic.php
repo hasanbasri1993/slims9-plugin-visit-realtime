@@ -16,14 +16,18 @@ if (!defined('INDEX_AUTH')) {
 }
 
 // ----------------------------------------------------------------------------
-// Define current public template directory
+// Define current public template directory for visit plugin
 // ----------------------------------------------------------------------------
-define('CURRENT_TEMPLATE_DIR', $sysconf['template']['dir'] . '/' . $sysconf['template']['theme'] . '/');
+if (!defined('CURRENT_TEMPLATE_DIR')) {
+  define('CURRENT_TEMPLATE_DIR', 'plugins/visit/theme/');
+}
 
 // ----------------------------------------------------------------------------
 // Method for create url assets
 // ----------------------------------------------------------------------------
-function assets($path = '')
-{
-  return CURRENT_TEMPLATE_DIR . 'assets/' . $path;
+if (!function_exists('assets')) {
+  function assets($path = '')
+  {
+    return 'plugins/visit/theme/assets/' . $path;
+  }
 }

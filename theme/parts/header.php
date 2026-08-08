@@ -62,6 +62,10 @@ $request_uri = urlencode(strip_tags(urldecode($_SERVER['REQUEST_URI'])));
         <meta property="twitter:image"
               content="//<?php echo $_SERVER["SERVER_NAME"] . SWB . $sysconf['template']['dir']; ?>/default/img/logo.png"/>
     <?php endif; ?>
+    <!-- // Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <!-- // load bootstrap style -->
     <link rel="stylesheet" href="<?php echo assets('css/bootstrap.min.css'); ?>">
     <!-- // font awesome -->
@@ -78,6 +82,8 @@ $request_uri = urlencode(strip_tags(urldecode($_SERVER['REQUEST_URI'])));
     <link rel="stylesheet" href="<?= JWB; ?>ion.rangeSlider/css/ion.rangeSlider.min.css">
     <!-- // my custom style -->
     <link rel="stylesheet" href="<?php echo assets('css/style.css?v=' . date('Ymd-his')); ?>">
+    <!-- Visitor Kiosk Redesign CSS -->
+    <link rel="stylesheet" href="<?php echo assets('css/visitor-redesign.css?v=' . date('Ymd-his')); ?>">
 
     <?php
     $icon = SWB . 'webicon.ico';
