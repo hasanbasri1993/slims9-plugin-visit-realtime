@@ -273,12 +273,14 @@ if (isset($_POST['counter'])) {
     $pusherUseTls
   );
 
+  $nowCheckin = date('Y-m-d H:i:s');
   $data['member_image'] = $image;
   $data['member_id'] = $memberId;
   $data['member_name'] = $memberName;
   $data['institution'] = $institution;
   $data['visit_purpose'] = $visitPurpose;
   $data['visit_purpose_text'] = $visitPurposeText;
+  $data['checkin_date'] = $nowCheckin;
   $data['message'] =  $memberName . __(', thank you for inserting your data to our visitor log');
   if (isset($visitPurposeText) && !empty($visitPurposeText)) {
     $data['message'] .= ' (' .  $visitPurposeText . ')';
@@ -297,7 +299,8 @@ if (isset($_POST['counter'])) {
     'member_name' => $memberName ?? trim($_POST['memberID']),
     'memberName' => $memberName ?? trim($_POST['memberID']),
     'visit_purpose' => $visitPurpose,
-    'visit_purpose_text' => $visitPurposeText
+    'visit_purpose_text' => $visitPurposeText,
+    'checkin_date' => $nowCheckin
   ])->withHeader());
 }
 

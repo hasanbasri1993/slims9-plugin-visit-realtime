@@ -632,7 +632,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                         member_name: self.memberName,
                         room_name: self.visitPurposeText || 'Perpustakaan',
                         member_image: data.member_image || 'photo.png',
-                        checkin_date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                        checkin_date: data.checkin_date || new Date()
                     });
 
                     if (self.ttsEnabled) {
@@ -706,13 +706,59 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
             },
             formatTime: function(dateStr) {
                 if (!dateStr) return '';
-                if (dateStr.includes(':')) {
-                    let parts = dateStr.split(' ');
-                    let timePart = parts[parts.length - 1];
-                    let sub = timePart.split(':');
-                    if (sub.length >= 2) return `${sub[0]}:${sub[1]}`;
+
+                let year, month, day, hours, minutes;
+
+                if (dateStr instanceof Date) {
+                    year = dateStr.getFullYear();
+                    month = dateStr.getMonth() + 1;
+                    day = dateStr.getDate();
+                    hours = dateStr.getHours();
+                    minutes = dateStr.getMinutes();
+                } else if (typeof dateStr === 'string') {
+                    let str = dateStr.trim();
+                    let match = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{1,2})(?::\d{1,2})?)?/);
+                    if (match) {
+                        year = parseInt(match[1], 10);
+                        month = parseInt(match[2], 10);
+                        day = parseInt(match[3], 10);
+                        hours = match[4] !== undefined ? parseInt(match[4], 10) : 0;
+                        minutes = match[5] !== undefined ? parseInt(match[5], 10) : 0;
+                    } else {
+                        let d = new Date(str);
+                        if (!isNaN(d.getTime())) {
+                            year = d.getFullYear();
+                            month = d.getMonth() + 1;
+                            day = d.getDate();
+                            hours = d.getHours();
+                            minutes = d.getMinutes();
+                        } else if (str.includes(':')) {
+                            let sub = str.split(':');
+                            if (sub.length >= 2) return `${sub[0].padStart(2, '0')}:${sub[1].padStart(2, '0')}`;
+                            return str;
+                        } else {
+                            return str;
+                        }
+                    }
+                } else {
+                    return String(dateStr);
                 }
-                return dateStr;
+
+                let pad = (num) => String(num).padStart(2, '0');
+                let formattedTime = `${pad(hours)}:${pad(minutes)}`;
+
+                let now = new Date();
+                let nowYear = now.getFullYear();
+                let nowMonth = now.getMonth() + 1;
+                let nowDay = now.getDate();
+
+                if (year === nowYear && month === nowMonth && day === nowDay) {
+                    return formattedTime;
+                } else if (year === nowYear) {
+                    return `${pad(day)}/${pad(month)} ${formattedTime}`;
+                } else {
+                    return `${pad(day)}/${pad(month)}/${year} ${formattedTime}`;
+                }
             },
             addRecentVisitor: function(visitorObj) {
                 this.recentVisitors.unshift(visitorObj);
@@ -815,7 +861,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
                             member_name: realName,
                             room_name: this.visitPurposeText || 'Perpustakaan',
                             member_image: res.data.image || 'photo.png',
-                            checkin_date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                            checkin_date: res.data.checkin_date || new Date()
                         });
 
                         <?php if ($sysconf['template']['visitor_log_voice']) : ?>
