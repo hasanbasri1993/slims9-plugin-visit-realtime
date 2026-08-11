@@ -513,7 +513,7 @@ $announcementText = $env['ANNOUNCEMENT_TEXT'] ?? "Selamat Datang di Perpustakaan
 <script src="<?php echo assets('js/Speakit.1.1.0.cdn.min.js'); ?>"></script>
 
 <script>
-    Pusher.logToConsole = true;
+    Pusher.logToConsole = false;
 
     var pusher = new Pusher('<?= (is_array($env) && isset($env['PUSHER_KEY'])) ? $env['PUSHER_KEY'] : ''; ?>', {
         cluster: 'ap1',
